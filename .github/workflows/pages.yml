@@ -1,0 +1,33 @@
+# Publish the 不晚 visual spec site (design/buwan-ds) to GitHub Pages.
+# The site is static and uses relative paths only, so it works under /buwan-public/.
+name: Spec site
+
+on:
+  push:
+    branches: [main]
+    paths: ["design/buwan-ds/**", ".github/workflows/pages.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: design/buwan-ds
+      - id: deployment
+        uses: actions/deploy-pages@v4

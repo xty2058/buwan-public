@@ -54,7 +54,7 @@ python3 scripts/verify.py
 | 路径 | 内容 |
 |---|---|
 | `MVP1.0/步骤4-前后端与数据基础/` | 应用：`backend/`、`frontend/`、`migrations/`、`scripts/`、`tests/`（目录名为历史沿用） |
-| `design/buwan-ds/` | 不晚视觉规范（Token、图标、角色立绘），产品直接加载 |
+| `design/buwan-ds/` | 不晚视觉规范（Token、图标、角色立绘），产品直接加载；在线浏览：https://xty2058.github.io/buwan-public/ |
 | `deploy/` | Dockerfile、docker compose、Caddy 配置与部署说明 |
 | `scripts/verify.py` | 一键运行全部测试 |
 
