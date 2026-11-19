@@ -1,0 +1,823 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="bw-icons" content="assets/icons.svg">
+<title>不晚 设计系统 · 基础</title>
+<link rel="stylesheet" href="styles/tokens.css">
+<link rel="stylesheet" href="styles/layout.css">
+<link rel="stylesheet" href="styles/components.css">
+<link rel="stylesheet" href="styles/docs.css">
+<script>try{if(localStorage.getItem('bw-theme')==='light')document.documentElement.setAttribute('data-theme','light')}catch(e){}</script>
+<script src="scripts/main.js" defer></script>
+<script src="scripts/pages/foundations.js" defer></script>
+</head>
+<body class="bw-canvas">
+<a class="bw-skip" href="#main">跳到正文</a>
+<div class="bw-docs">
+  <nav class="bw-docs__sidebar" data-bw-sidebar aria-label="规范导航">
+    <div class="bw-docs__sidebar-head">
+      <a class="bw-docs__brand" href="index.html"><span class="bw-docs__brand-mark" aria-hidden="true"></span><span class="bw-wordmark">不晚</span><span class="bw-fine">Design System</span></a>
+      <button class="bw-icon-btn bw-icon-btn--sm" type="button" data-bw-theme-toggle aria-pressed="false" aria-label="切换到浅色"><svg class="bw-icon bw-icon--sm" aria-hidden="true"><use href="assets/icons.svg#sun"/></svg></button>
+    </div>
+    <div class="bw-sidenav">
+      <div class="bw-sidenav__group">
+        <a class="bw-sidenav__link bw-sidenav__link--page" href="index.html">总览</a>
+        <a class="bw-sidenav__link bw-sidenav__link--page" href="foundations.html" aria-current="page">基础</a>
+        <div class="bw-sidenav__sub">
+          <a class="bw-sidenav__link bw-sidenav__link--sub" href="#derivation">推导表</a>
+          <a class="bw-sidenav__link bw-sidenav__link--sub" href="#color">色彩</a>
+          <a class="bw-sidenav__link bw-sidenav__link--sub" href="#type">字体</a>
+          <a class="bw-sidenav__link bw-sidenav__link--sub" href="#space">空间</a>
+          <a class="bw-sidenav__link bw-sidenav__link--sub" href="#grid">栅格与断点</a>
+          <a class="bw-sidenav__link bw-sidenav__link--sub" href="#shape">圆角、边框、阴影</a>
+          <a class="bw-sidenav__link bw-sidenav__link--sub" href="#icon">图标与图形</a>
+          <a class="bw-sidenav__link bw-sidenav__link--sub" href="#motion">动效</a>
+          <a class="bw-sidenav__link bw-sidenav__link--sub" href="#a11y">可访问性</a>
+          <a class="bw-sidenav__link bw-sidenav__link--sub" href="#voice">文案与语气</a>
+          <a class="bw-sidenav__link bw-sidenav__link--sub" href="#tokens">Token 表</a>
+        </div>
+        <a class="bw-sidenav__link bw-sidenav__link--page" href="components.html">组件</a>
+        <a class="bw-sidenav__link bw-sidenav__link--page" href="audit.html">自检</a>
+      </div>
+      <div class="bw-sidenav__group">
+        <p class="bw-label bw-sidenav__heading">核心页面</p>
+        <a class="bw-sidenav__link" href="pages/discover.html">S1 发现与开聊</a>
+        <a class="bw-sidenav__link" href="pages/chat.html">S2 日常聊天</a>
+        <a class="bw-sidenav__link" href="pages/return.html">S3 隔天回归</a>
+        <a class="bw-sidenav__link" href="pages/control.html">S4 分支与纠正</a>
+        <a class="bw-sidenav__link" href="pages/payment.html">S5 额度与付费</a>
+      </div>
+    </div>
+  </nav>
+  <div class="bw-docs__scrim" data-bw-scrim></div>
+
+  <div class="bw-docs__main">
+    <header class="bw-docs__bar">
+      <button class="bw-icon-btn bw-docs__menu" type="button" data-bw-nav-toggle aria-expanded="false" aria-label="打开导航"><svg class="bw-icon" aria-hidden="true"><use href="assets/icons.svg#menu"/></svg></button>
+      <span class="bw-caption">基础</span>
+      <div class="bw-docs__bar-end">
+        <button class="bw-icon-btn" type="button" data-bw-theme-toggle aria-pressed="false" aria-label="切换到浅色"><svg class="bw-icon" aria-hidden="true"><use href="assets/icons.svg#sun"/></svg></button>
+      </div>
+    </header>
+
+    <main id="main" class="bw-docs__content">
+      <section class="bw-hero" aria-labelledby="t-hero">
+        <p class="bw-hero__eyebrow">FOUNDATIONS · 基础</p>
+        <h1 id="t-hero" class="bw-hero__title">从场景推导出来的每一个值。</h1>
+        <p class="bw-hero__lede">先有用户和场景，再有体验承诺和品牌原则，最后才是颜色、字号、间距和动效。本页把这条链路写清楚，并给出每个 Token 的用法和禁用规则。</p>
+      </section>
+
+      <!-- ===================== 1. 推导表 ===================== -->
+      <section id="derivation" class="bw-section" aria-labelledby="t-derivation" data-principle="P0 P1 P2 P3 P4 P5 P6">
+        <div class="bw-section__head">
+          <p class="bw-section__id">#derivation</p>
+          <h2 id="t-derivation" class="bw-title">场景 → 品牌 → 视觉 推导表</h2>
+          <p class="bw-caption bw-prose">每一行都必须能从左读到右：用户在什么场景里痛 → 我们承诺什么 → 落到哪条品牌原则 → 视觉和交互怎么做 → 用哪个 Token / 组件实现。不能追溯到这张表的样式，不进入系统。</p>
+        </div>
+
+        <div class="bw-subsection">
+          <h3 class="bw-heading">双声部结构</h3>
+          <p class="bw-text bw-muted bw-prose">贯穿全表的结构性决策。不晚不再用宋体区分声音，而是靠<b>表面、字号和颜色</b>：</p>
+          <div class="bw-grid bw-grid--2">
+            <article class="bw-card bw-stack bw-stack--3">
+              <span class="bw-tag bw-tag--accent">角色声部</span>
+              <p class="bw-text">对白、开场台词、剧情回顾。</p>
+              <ul class="bw-checklist">
+                <li class="bw-checklist__item"><svg class="bw-icon bw-icon--sm" aria-hidden="true"><use href="assets/icons.svg#check"/></svg>玻璃气泡 <code class="bw-code-inline">.bw-bubble--character</code></li>
+                <li class="bw-checklist__item"><svg class="bw-icon bw-icon--sm" aria-hidden="true"><use href="assets/icons.svg#check"/></svg>正文字号 16 <code class="bw-code-inline">--bw-text-base</code></li>
+                <li class="bw-checklist__item"><svg class="bw-icon bw-icon--sm" aria-hidden="true"><use href="assets/icons.svg#check"/></svg>主文字色 <code class="bw-code-inline">--bw-color-text</code></li>
+              </ul>
+            </article>
+            <article class="bw-card bw-stack bw-stack--3">
+              <span class="bw-tag">系统声部</span>
+              <p class="bw-text">规则、扣费、存档、错误、提示。</p>
+              <ul class="bw-checklist">
+                <li class="bw-checklist__item"><svg class="bw-icon bw-icon--sm" aria-hidden="true"><use href="assets/icons.svg#check"/></svg>居中细行或通知条 <code class="bw-code-inline">.bw-system-line</code> <code class="bw-code-inline">.bw-notice</code></li>
+                <li class="bw-checklist__item"><svg class="bw-icon bw-icon--sm" aria-hidden="true"><use href="assets/icons.svg#check"/></svg>小一档字号 12–13 <code class="bw-code-inline">--bw-text-xs</code></li>
+                <li class="bw-checklist__item"><svg class="bw-icon bw-icon--sm" aria-hidden="true"><use href="assets/icons.svg#check"/></svg>提示色 <code class="bw-code-inline">--bw-color-text-3</code>，永不进入气泡</li>
+              </ul>
+            </article>
+          </div>
+        </div>
+
+        <div class="bw-table-wrap">
+          <table class="bw-table">
+            <caption>推导表 · 17 行 + 1 行预留</caption>
+            <thead><tr><th scope="col">场景 / 痛点</th><th scope="col">体验承诺</th><th scope="col">品牌原则</th><th scope="col">视觉 / 交互决策</th><th scope="col">Token / 组件</th></tr></thead>
+            <tbody>
+              <tr><td><span class="bw-tag">S1</span> 挑剔、没耐心，很快划走</td><td>3 秒内判断合不合拍</td><td>P0 角色在前</td><td>一屏一个人：全屏立绘 + 底部黑色渐变，上下滑切换；名字与性格固定在输入框上方；标签最多 3 个；不放位置圆点、热度数字、AI 标识</td><td><code class="bw-code-inline">.bw-spotlight</code> <code class="bw-code-inline">.bw-immersive</code> <code class="bw-code-inline">--bw-scrim-spotlight</code> <code class="bw-code-inline">.bw-tag--on-image</code></td></tr>
+              <tr><td><span class="bw-tag">S1</span> 注册、找卡困难</td><td>一次点击就能开聊</td><td>P0 角色在前</td><td>主操作就是输入框，已替你写好第一句；发送后在首页原地开聊，不跳页、不要求注册</td><td><code class="bw-code-inline">.bw-starter</code> <code class="bw-code-inline">.bw-thread--on-image</code></td></tr>
+              <tr><td><span class="bw-tag">S1</span> 首聊太像 AI</td><td>第一句就像这个人</td><td>P1 同一个人</td><td>毛玻璃开场面板：一个情境 + 他的第一句原话，可原地换开场</td><td><code class="bw-code-inline">.bw-opening-panel</code></td></tr>
+              <tr><td><span class="bw-tag">S2</span> 回复截断、重复、卡顿</td><td>有回应就显示；出错说清楚，且不扣</td><td>P2 稳</td><td>流式光标、匀速呼吸的输入指示；气泡内“续写 / 重写”并注明“本条不计费”</td><td><code class="bw-code-inline">.bw-bubble.is-streaming</code> <code class="bw-code-inline">.bw-typing</code> <code class="bw-code-inline">.bw-retry</code> <code class="bw-code-inline">--bw-dur-breath</code></td></tr>
+              <tr><td><span class="bw-tag">S2</span> 抢话、AI 替用户说话</td><td>你的话只由你说</td><td>P4 由你决定</td><td>用户气泡是实底（深色奶白 / 浅色深墨），视觉身份独占，角色输出不能使用</td><td><code class="bw-code-inline">--bw-color-user-bubble</code> <code class="bw-code-inline">.bw-bubble--user</code></td></tr>
+              <tr><td><span class="bw-tag">S2</span> 聊天中插广告</td><td>沉浸区里没有任何商业内容</td><td>P0 角色在前</td><td>推广类内容禁入对话流；额度只在输入框上方的系统细行出现</td><td><code class="bw-code-inline">.bw-thread</code> <code class="bw-code-inline">.bw-quota-hint</code> <code class="bw-code-inline">.bw-composer</code></td></tr>
+              <tr><td><span class="bw-tag">S3</span> 忘了前文和重要剧情</td><td>它记得什么，你看得见</td><td>P3 记得对</td><td>烛金是记忆专用色；角色用到记忆时气泡下出现“想起了：…”标签，可点开</td><td><code class="bw-code-inline">--bw-color-memory-*</code> <code class="bw-code-inline">.bw-memory-chip</code></td></tr>
+              <tr><td><span class="bw-tag">S3</span> 隔天回来接不上</td><td>从上次那一页接着聊</td><td>P5 接得上</td><td>回到会话先看到“上次聊到” + 未完成的约定；不弹窗，可以直接打字</td><td><code class="bw-code-inline">.bw-recap</code> <code class="bw-code-inline">.bw-promise</code> <code class="bw-code-inline">--bw-gradient-memory</code></td></tr>
+              <tr><td><span class="bw-tag">S3</span> 存档丢失、角色下架</td><td>你的存档一直在</td><td>P5 接得上 · P6 规则先行</td><td>顶栏常驻存档状态；下架时给延续方案、时间和导出入口</td><td><code class="bw-code-inline">.bw-continuity</code> <code class="bw-code-inline">.bw-notice</code></td></tr>
+              <tr><td><span class="bw-tag">S3</span> 换模型像换人</td><td>换了引擎，还是同一个人</td><td>P1 同一个人</td><td>系统声部说明“引擎已更新，人设和记忆不变”，可展开人设锚点清单</td><td><code class="bw-code-inline">.bw-notice--memory</code> <code class="bw-code-inline">.bw-checklist--memory</code> 图标 anchor</td></tr>
+              <tr><td><span class="bw-tag">S4</span> 想推进 / 放慢 / 拒绝</td><td>每个选择都同样容易点</td><td>P4 由你决定</td><td>选项等宽、同色阶；拒绝后关系正常延续，不惩罚；关系阶段只由用户推进</td><td><code class="bw-code-inline">.bw-choice-group</code> <code class="bw-code-inline">.bw-btn--choice</code> <code class="bw-code-inline">.bw-stage</code></td></tr>
+              <tr><td><span class="bw-tag">S4</span> 用“新建会话”代替分支</td><td>在这里分岔，原来那条线还在</td><td>P4 · P5</td><td>任意消息可“从这里分岔”；分支可命名、切换，原线保留</td><td><code class="bw-code-inline">.bw-branch-point</code> <code class="bw-code-inline">.bw-branch-switcher</code> 图标 fork</td></tr>
+              <tr><td><span class="bw-tag">S4</span> 角色记错了</td><td>改了马上生效，看得见</td><td>P3 记得对</td><td>“原来 → 改为”纠正面板；提交后系统提示“之后按这个来”，原处保留修订痕迹</td><td><code class="bw-code-inline">.bw-correction</code> <code class="bw-code-inline">.bw-memory-item.is-corrected</code> <code class="bw-code-inline">.bw-toast--memory</code></td></tr>
+              <tr><td><span class="bw-tag">S5</span> 扣费规则看不懂</td><td>一句话讲清怎么扣</td><td>P6 规则先行</td><td>规则清单放在价格之上；金额和额度用等宽数字</td><td><code class="bw-code-inline">.bw-checklist</code> <code class="bw-code-inline">.bw-plan</code> <code class="bw-code-inline">.bw-num</code></td></tr>
+              <tr><td><span class="bw-tag">S5</span> 失败照样扣费</td><td>每一笔都能查</td><td>P6 规则先行</td><td>逐条消耗明细，失败的标“未扣”；额度条用中性色，紧张时也不变红</td><td><code class="bw-code-inline">.bw-table</code> <code class="bw-code-inline">.bw-tag--success</code> <code class="bw-code-inline">.bw-meter.is-low</code></td></tr>
+              <tr><td><span class="bw-tag">S5</span> 怕跑路、涨价、额度缩水</td><td>现在说好的，以后也算数</td><td>P6 规则先行</td><td>价格承诺写在付费页；只有月付；退订入口和购买同屏</td><td><code class="bw-code-inline">.bw-notice</code> <code class="bw-code-inline">.bw-btn--secondary</code></td></tr>
+              <tr><td><span class="bw-tag">S5</span> 付费打断沉浸</td><td>不拿角色来催你付费</td><td>P0 · P6</td><td>付费只用系统声部；额度用完时保留这次对话要接着说的位置</td><td><a href="#voice">文案规则</a> <code class="bw-code-inline">.bw-quota-hint</code> <code class="bw-code-inline">.bw-system-line</code></td></tr>
+              <tr class="is-muted"><td><span class="bw-tag">C</span> 角色创作者（预留）</td><td>—</td><td>—</td><td>角色卡预留作者区；立绘底可扩展</td><td><code class="bw-code-inline">--bw-portrait-n</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="bw-table-wrap">
+          <table class="bw-table">
+            <caption>显式假设 H1–H8（已按确认结果更新）</caption>
+            <thead><tr><th scope="col">编号</th><th scope="col">假设</th><th scope="col">依据</th></tr></thead>
+            <tbody>
+              <tr><td><span class="bw-tag">H1</span></td><td>产品名「不晚」；代码前缀 <code class="bw-code-inline">bw</code></td><td>已确认</td></tr>
+              <tr><td><span class="bw-tag">H2</span></td><td>移动优先（H5 / App 内嵌），桌面响应式；≥1024 时会话页分栏显示记忆面板</td><td>A、B 都在碎片时间高频使用</td></tr>
+              <tr><td><span class="bw-tag">H3</span></td><td>免费每天 30 条，次日 6:00 恢复；月卡 ¥18 / 月 600 条；加油包 ¥6 / 150 条不过期。只算角色回复，用户发的不算；没生成完、重复、出错都不扣；无年付、无大额预充</td><td>A 拒绝年付；“失败照扣”是 S5 核心痛点</td></tr>
+              <tr><td><span class="bw-tag">H4</span></td><td>访客无需注册即可聊 10 条，想保存时再注册</td><td>S1：找卡困难、没耐心</td></tr>
+              <tr><td><span class="bw-tag">H5</span></td><td>只用 iOS 系统字体（SF / 苹方），其他平台自动回落系统字体；不加载网络字体</td><td>已确认；加载快、零授权风险</td></tr>
+              <tr><td><span class="bw-tag">H6</span></td><td>深色“暮光”为品牌默认；浅色“暮光·浅”可切换并被记住</td><td>已确认方向；夜间是高频时段</td></tr>
+              <tr><td><span class="bw-tag">H7</span></td><td>换模型时后端保证人设锚点与记忆不变，前端负责说明</td><td>S3：“换模型像换人”</td></tr>
+              <tr><td><span class="bw-tag">H8</span></td><td>创作者暂缓：只预留角色卡作者区与立绘 Token 扩展</td><td>按需求不作为主线</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===================== 2. 色彩 ===================== -->
+      <section id="color" class="bw-section" aria-labelledby="t-color" data-principle="P0 P1 P3 P4 P6">
+        <div class="bw-section__head">
+          <p class="bw-section__id">#color</p>
+          <h2 id="t-color" class="bw-title">色彩</h2>
+          <p class="bw-caption bw-prose">三个语义色各管一件事：<b>暮光渐变</b>属于关系，<b>烛金</b>只属于记忆，<b>奶白 / 深墨实底</b>只属于用户自己的话。中性色负责其余一切，语义状态色永远和图标、文字一起出现。</p>
+        </div>
+
+        <div class="bw-subsection">
+          <h3 class="bw-heading">深色 · 暮光（品牌默认）</h3>
+          <div id="swatches-dark" class="bw-palette-board">
+            <div class="bw-palette-group">
+              <div class="bw-palette-group__head"><p class="bw-palette-group__title">品牌 / 关系</p><p class="bw-label">P1 P4</p></div>
+              <div class="bw-palette">
+                <div class="bw-palette__tile bw-palette__tile--hero" data-bw-swatch="--bw-gradient-accent"><span class="bw-palette__name">暮光渐变（主按钮）</span><code class="bw-palette__token">--bw-gradient-accent</code><span class="bw-palette__value" data-bw-swatch-value></span></div>
+                <div class="bw-palette__tile" data-bw-swatch="--bw-color-accent"><span class="bw-palette__name">强调文字 / 链接</span><code class="bw-palette__token">--bw-color-accent</code><span class="bw-palette__value" data-bw-swatch-value></span></div>
+                <div class="bw-palette__tile" data-bw-swatch="--bw-color-accent-soft"><span class="bw-palette__name">选中底</span><code class="bw-palette__token">--bw-color-accent-soft</code><span class="bw-palette__value" data-bw-swatch-value></span></div>
+                <div class="bw-palette__tile" data-bw-swatch="--bw-color-on-accent"><span class="bw-palette__name">渐变上的文字</span><code class="bw-palette__token">--bw-color-on-accent</code><span class="bw-palette__value" data-bw-swatch-value></span></div>
+              </div>
+            </div>
+            <div class="bw-palette-group">
+              <div class="bw-palette-group__head"><p class="bw-palette-group__title">记忆</p><p class="bw-label">烛金 · 只给记忆 · P3 P5</p></div>
+              <div class="bw-palette">
+                <div class="bw-palette__tile bw-palette__tile--hero" data-bw-swatch="--bw-color-memory"><span class="bw-palette__name">记忆文字 / 图标</span><code class="bw-palette__token">--bw-color-memory</code><span class="bw-palette__value" data-bw-swatch-value></span></div>
+                <div class="bw-palette__tile" data-bw-swatch="--bw-color-memory-soft"><span class="bw-palette__name">记忆底</span><code class="bw-palette__token">--bw-color-memory-soft</code><span class="bw-palette__value" data-bw-swatch-value></span></div>
+                <div class="bw-palette__tile" data-bw-swatch="--bw-color-memory-border"><span class="bw-palette__name">记忆描边</span><code class="bw-palette__token">--bw-color-memory-border</code><span class="bw-palette__value" data-bw-swatch-value></span></div>
+                <div class="bw-palette__tile" data-bw-swatch="--bw-gradient-memory"><span class="bw-palette__name">一根线（回顾、时间线）</span><code class="bw-palette__token">--bw-gradient-memory</code><span class="bw-palette__value" data-bw-swatch-value></span></div>
+              </div>
+            </div>
+            <div class="bw-palette-group">
+              <div class="bw-palette-group__head"><p class="bw-palette-group__title">用户声部</p><p class="bw-label">P4</p></div>
+              <div class="bw-palette">
+                <div class="bw-palette__tile bw-palette__tile--hero" data-bw-swatch="--bw-color-user-bubble"><span class="bw-palette__name">用户气泡</span><code class="bw-palette__token">--bw-color-user-bubble</code><span class="bw-palette__value" data-bw-swatch-value></span></div>
+                <div class="bw-palette__tile" data-bw-swatch="--bw-color-user-text"><span class="bw-palette__name">用户气泡文字</span><code class="bw-palette__token">--bw-color-user-text</code><span class="bw-palette__value" data-bw-swatch-value></span></div>
+              </div>
+            </div>
+            <div class="bw-palette-group">
+              <div class="bw-palette-group__head"><p class="bw-palette-group__title">中性</p><p class="bw-label">文字三级与线条</p></div>
+              <div class="bw-palette">
+                <div class="bw-palette__tile bw-palette__tile--hero" data-bw-swatch="--bw-color-bg"><span class="bw-palette__name">页面底</span><code class="bw-palette__token">--bw-color-bg</code><span class="bw-palette__value" data-bw-swatch-value></span></div>
+                <div class="bw-palette__tile" data-bw-swatch="--bw-color-text"><span class="bw-palette__name">正文</span><code class="bw-palette__token">--bw-color-text</code><span class="bw-palette__value" data-bw-swatch-value></span></div>
+                <div class="bw-palette__tile" data-bw-swatch="--bw-color-text-2"><span class="bw-palette__name">次要</span><code class="bw-palette__token">--bw-color-text-2</code><span class="bw-palette__value" data-bw-swatch-value></span></div>
+                <div class="bw-palette__tile" data-bw-swatch="--bw-color-text-3"><span class="bw-palette__name">提示 / 系统声部</span><code class="bw-palette__token">--bw-color-text-3</code><span class="bw-palette__value" data-bw-swatch-value></span></div>
+                <div class="bw-palette__tile" data-bw-swatch="--bw-color-line"><span class="bw-palette__name">分隔线</span><code class="bw-palette__token">--bw-color-line</code><span class="bw-palette__value" data-bw-swatch-value></span></div>
+                <div class="bw-palette__tile" data-bw-swatch="--bw-color-line-strong"><span class="bw-palette__name">控件描边</span><code class="bw-palette__token">--bw-color-line-strong</code><span class="bw-palette__value" data-bw-swatch-value></span></div>
+              </div>
+            </div>
+            <div class="bw-palette-group">
+              <div class="bw-palette-group__head"><p class="bw-palette-group__title">语义状态</p><p class="bw-label">必须配图标和文字 · P6</p></div>
+              <div class="bw-palette">
+                <div class="bw-palette__tile" data-bw-swatch="--bw-color-success"><span class="bw-palette__name">成功 / 未扣费</span><code class="bw-palette__token">--bw-color-success</code><span class="bw-palette__value" data-bw-swatch-value></span></div>
+                <div class="bw-palette__tile" data-bw-swatch="--bw-color-warning"><span class="bw-palette__name">警告（偏橙红，避开烛金）</span><code class="bw-palette__token">--bw-color-warning</code><span class="bw-palette__value" data-bw-swatch-value></span></div>
+                <div class="bw-palette__tile" data-bw-swatch="--bw-color-danger"><span class="bw-palette__name">危险 / 出错</span><code class="bw-palette__token">--bw-color-danger</code><span class="bw-palette__value" data-bw-swatch-value></span></div>
+                <div class="bw-palette__tile" data-bw-swatch="--bw-color-info"><span class="bw-palette__name">信息</span><code class="bw-palette__token">--bw-color-info</code><span class="bw-palette__value" data-bw-swatch-value></span></div>
+                <div class="bw-palette__tile" data-bw-swatch="--bw-color-focus"><span class="bw-palette__name">焦点环</span><code class="bw-palette__token">--bw-color-focus</code><span class="bw-palette__value" data-bw-swatch-value></span></div>
+              </div>
+            </div>
+            <div class="bw-palette-group">
+              <div class="bw-palette-group__head"><p class="bw-palette-group__title">材质</p><p class="bw-label">玻璃三级与环境光 · P0</p></div>
+              <div class="bw-palette">
+                <div class="bw-palette__tile" data-bw-swatch="--bw-glass-1"><span class="bw-palette__name">玻璃 1 · 卡片、气泡</span><code class="bw-palette__token">--bw-glass-1</code><span class="bw-palette__value" data-bw-swatch-value></span></div>
+                <div class="bw-palette__tile" data-bw-swatch="--bw-glass-2"><span class="bw-palette__name">玻璃 2 · 按钮、强调面</span><code class="bw-palette__token">--bw-glass-2</code><span class="bw-palette__value" data-bw-swatch-value></span></div>
+                <div class="bw-palette__tile" data-bw-swatch="--bw-glass-solid"><span class="bw-palette__name">实底玻璃 · 输入、规则、弹窗</span><code class="bw-palette__token">--bw-glass-solid</code><span class="bw-palette__value" data-bw-swatch-value></span></div>
+                <div class="bw-palette__tile bw-palette__tile--hero" data-bw-swatch="--bw-aurora"><span class="bw-palette__name">暮光环境光</span><code class="bw-palette__token">--bw-aurora</code><span class="bw-palette__value" data-bw-swatch-value></span></div>
+                <div class="bw-palette__tile" data-bw-swatch="--bw-glow-orb"><span class="bw-palette__name">光球（空状态、品牌标）</span><code class="bw-palette__token">--bw-glow-orb</code><span class="bw-palette__value" data-bw-swatch-value></span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bw-subsection">
+          <h3 class="bw-heading">浅色 · 暮光·浅</h3>
+          <p class="bw-caption">下面是同一组 Token 在 <code class="bw-code-inline">data-theme="light"</code> 容器里的取值。组件不需要任何改动，主题切换只换 Token。</p>
+          <div class="bw-palette-board" data-theme="light" data-bw-clone-from="swatches-dark"></div>
+        </div>
+
+        <div class="bw-subsection">
+          <h3 class="bw-heading">状态色永远不单独出现</h3>
+          <div class="bw-demo bw-demo--stack">
+            <div class="bw-notice bw-notice--success"><svg class="bw-icon" aria-hidden="true"><use href="assets/icons.svg#check"/></svg><div class="bw-notice__body"><p class="bw-notice__title">这条没生成完，不扣</p><p>可以续写，也可以重写。</p></div></div>
+            <div class="bw-notice bw-notice--warning"><svg class="bw-icon" aria-hidden="true"><use href="assets/icons.svg#alert"/></svg><div class="bw-notice__body"><p class="bw-notice__title">网络不稳</p><p>消息已经存好，恢复后会自动发出。</p></div></div>
+            <div class="bw-notice bw-notice--danger"><svg class="bw-icon" aria-hidden="true"><use href="assets/icons.svg#alert-circle"/></svg><div class="bw-notice__body"><p class="bw-notice__title">存档失败</p><p>这几条还在本机，点重试再存一次。</p></div></div>
+            <div class="bw-notice bw-notice--memory"><svg class="bw-icon" aria-hidden="true"><use href="assets/icons.svg#bookmark"/></svg><div class="bw-notice__body"><p class="bw-notice__title">已记住：你怕打雷</p><p>记忆用书签图标，绝不用警告三角。</p></div></div>
+          </div>
+        </div>
+
+        <div class="bw-subsection">
+          <h3 class="bw-heading">对比度实测</h3>
+          <p class="bw-caption">由 <code class="bw-code-inline">scripts/pages/foundations.js</code> 直接解析 tokens.css 计算：半透明色先与底色合成，再算 WCAG 对比度。结果：<b data-bw-contrast-summary>计算中…</b></p>
+          <div class="bw-table-wrap">
+            <table class="bw-table">
+              <caption>关键配对（要求 ≥ 4.5:1）</caption>
+              <thead><tr><th scope="col">配对</th><th scope="col" class="bw-table__num">深色</th><th scope="col">结论</th><th scope="col" class="bw-table__num">浅色</th><th scope="col">结论</th></tr></thead>
+              <tbody data-bw-contrast></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="bw-rule-grid">
+          <div class="bw-rule bw-rule--do">
+            <p class="bw-rule__title"><svg class="bw-icon bw-icon--sm" aria-hidden="true"><use href="assets/icons.svg#check"/></svg>这样用</p>
+            <ul>
+              <li>主按钮一屏最多一个，用暮光渐变</li>
+              <li>记忆、约定、回顾、记忆纠正一律用烛金</li>
+              <li>状态色配图标 + 文字，比如“✓ 未扣费”</li>
+              <li>文字只用三级中性色，不自创灰色</li>
+            </ul>
+          </div>
+          <div class="bw-rule bw-rule--dont">
+            <p class="bw-rule__title"><svg class="bw-icon bw-icon--sm" aria-hidden="true"><use href="assets/icons.svg#close"/></svg>不要这样</p>
+            <ul>
+              <li>用烛金做装饰、价格高亮或警告</li>
+              <li>额度紧张时把进度条变红</li>
+              <li>角色气泡用用户气泡的实底色</li>
+              <li>组件直接引用原始色板（<code class="bw-code-inline">--bw-rose-400</code> 等）</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== 3. 字体 ===================== -->
+      <section id="type" class="bw-section" aria-labelledby="t-type" data-principle="P0 P2 P6">
+        <div class="bw-section__head">
+          <p class="bw-section__id">#type</p>
+          <h2 id="t-type" class="bw-title">字体</h2>
+          <p class="bw-caption bw-prose">只用 iOS 系统字体：西文 SF Pro，中文苹方。安卓和桌面自动回落到各自系统字体，不加载任何网络字体，首屏零等待。</p>
+        </div>
+
+        <div class="bw-table-wrap">
+          <table class="bw-table">
+            <caption>字体栈</caption>
+            <thead><tr><th scope="col">Token</th><th scope="col">用途</th><th scope="col">示例</th></tr></thead>
+            <tbody>
+              <tr><td><code class="bw-code-inline">--bw-font-sans</code></td><td>界面与正文</td><td><span data-bw-font-family="--bw-font-sans">今晚，想和谁说说话？Tonight</span></td></tr>
+              <tr><td><code class="bw-code-inline">--bw-font-display</code></td><td>标题、角色名、大数字</td><td><span data-bw-font-family="--bw-font-display">沈砚 128</span></td></tr>
+              <tr><td><code class="bw-code-inline">--bw-font-mono</code></td><td>仅规范站代码与 Token 名</td><td><span data-bw-font-family="--bw-font-mono">--bw-color-memory</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="bw-table-wrap">
+          <table class="bw-table">
+            <caption>字号阶梯</caption>
+            <thead><tr><th scope="col">Token</th><th scope="col" class="bw-table__num">值</th><th scope="col">示例</th><th scope="col">用途</th></tr></thead>
+            <tbody>
+              <tr><td><code class="bw-code-inline">--bw-text-2xs</code></td><td class="bw-table__num">11</td><td><span data-bw-font-size="--bw-text-2xs">发现 · 对话 · 我的</span></td><td>仅标签栏文字、角标</td></tr>
+              <tr><td><code class="bw-code-inline">--bw-text-xs</code></td><td class="bw-table__num">12</td><td><span data-bw-font-size="--bw-text-xs">本月还剩 128 条 · 没生成完不扣</span></td><td>系统声部、标签、元信息</td></tr>
+              <tr><td><code class="bw-code-inline">--bw-text-sm</code></td><td class="bw-table__num">13</td><td><span data-bw-font-size="--bw-text-sm">28 · 建筑设计师 · 理性克制</span></td><td>说明、表格、通知</td></tr>
+              <tr><td><code class="bw-code-inline">--bw-text-md</code></td><td class="bw-table__num">15</td><td><span data-bw-font-size="--bw-text-md">界面默认字号，按钮与列表</span></td><td>界面默认</td></tr>
+              <tr><td><code class="bw-code-inline">--bw-text-base</code></td><td class="bw-table__num">16</td><td><span data-bw-font-size="--bw-text-base">早。今天周五，面试别迟到。</span></td><td>聊天正文、输入框（防 iOS 缩放）</td></tr>
+              <tr><td><code class="bw-code-inline">--bw-text-lg</code></td><td class="bw-table__num">18</td><td><span data-bw-font-size="--bw-text-lg">先说清楚怎么扣</span></td><td>卡片标题、弹窗标题</td></tr>
+              <tr><td><code class="bw-code-inline">--bw-text-xl</code></td><td class="bw-table__num">22</td><td><span data-bw-font-size="--bw-text-xl">沈砚</span></td><td>角色名、区块标题</td></tr>
+              <tr><td><code class="bw-code-inline">--bw-text-2xl</code></td><td class="bw-table__num">28</td><td><span data-bw-font-size="--bw-text-2xl">¥18 / 月</span></td><td>页面标题、价格</td></tr>
+              <tr><td><code class="bw-code-inline">--bw-text-3xl</code></td><td class="bw-table__num">34</td><td><span data-bw-font-size="--bw-text-3xl">今晚，想和谁说说话？</span></td><td>首屏大标题</td></tr>
+              <tr><td><code class="bw-code-inline">--bw-text-hero</code></td><td class="bw-table__num">54</td><td><span class="bw-num" data-bw-font-size="--bw-text-hero">128</span></td><td>额度大数字（S5）</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="bw-grid bw-grid--3">
+          <article class="bw-card bw-stack bw-stack--3">
+            <h3 class="bw-subheading">行高</h3>
+            <p class="bw-caption"><code class="bw-code-inline">--bw-leading-tight</code> 1.2 标题 · <code class="bw-code-inline">--bw-leading-snug</code> 1.4 界面 · <code class="bw-code-inline">--bw-leading-body</code> 1.6 中文正文。中文需要更松的行高，聊天正文固定 1.6。</p>
+          </article>
+          <article class="bw-card bw-stack bw-stack--3">
+            <h3 class="bw-subheading">字重只有三档</h3>
+            <p><span data-bw-font-weight="--bw-weight-regular">常规 400 正文</span> · <span data-bw-font-weight="--bw-weight-medium">中等 500 标签</span> · <span data-bw-font-weight="--bw-weight-semibold">半粗 600 标题</span></p>
+            <p class="bw-caption">不用 300 和 700：太细在玻璃上读不清，太粗显得喊。</p>
+          </article>
+          <article class="bw-card bw-stack bw-stack--3">
+            <h3 class="bw-subheading">字间距与数字</h3>
+            <p class="bw-caption">标题 <code class="bw-code-inline">--bw-tracking-display</code> -0.02em 收紧；标签 <code class="bw-code-inline">--bw-tracking-label</code> 0.04em 放松；品牌字标 0.08em。金额、额度、时间一律 <code class="bw-code-inline">.bw-num</code> 等宽数字，对齐不跳动。</p>
+          </article>
+        </div>
+
+        <div class="bw-table-wrap">
+          <table class="bw-table">
+            <caption>字体样式类（页面只能用这些组合）</caption>
+            <thead><tr><th scope="col">类</th><th scope="col">示例</th><th scope="col">组成</th></tr></thead>
+            <tbody>
+              <tr><td><code class="bw-code-inline">.bw-display</code></td><td><span class="bw-display">今晚，想和谁说说话？</span></td><td>display · 3xl · 600</td></tr>
+              <tr><td><code class="bw-code-inline">.bw-title</code></td><td><span class="bw-title">继续和沈砚聊</span></td><td>display · 2xl · 600</td></tr>
+              <tr><td><code class="bw-code-inline">.bw-heading</code></td><td><span class="bw-heading">你们的共同经历</span></td><td>display · xl · 600</td></tr>
+              <tr><td><code class="bw-code-inline">.bw-subheading</code></td><td><span class="bw-subheading">先说清楚怎么扣</span></td><td>lg · 600</td></tr>
+              <tr><td><code class="bw-code-inline">.bw-body</code></td><td><span class="bw-body">早。今天周五，面试别迟到。</span></td><td>base 16 · 1.6</td></tr>
+              <tr><td><code class="bw-code-inline">.bw-text</code></td><td><span class="bw-text">界面默认文字</span></td><td>md 15 · 1.6</td></tr>
+              <tr><td><code class="bw-code-inline">.bw-caption</code></td><td><span class="bw-caption">28 · 建筑设计师 · 理性克制</span></td><td>sm · text-2</td></tr>
+              <tr><td><code class="bw-code-inline">.bw-fine</code></td><td><span class="bw-fine">退订在「我的 › 订阅」，一步完成</span></td><td>xs · text-3</td></tr>
+              <tr><td><code class="bw-code-inline">.bw-label</code></td><td><span class="bw-label">上次聊到 · 昨晚 23:40</span></td><td>xs · 500 · tracking</td></tr>
+              <tr><td><code class="bw-code-inline">.bw-num--hero</code></td><td><span class="bw-num bw-num--hero">128</span></td><td>hero 54 · 等宽</td></tr>
+              <tr><td><code class="bw-code-inline">.bw-wordmark</code></td><td><span class="bw-wordmark">不晚</span></td><td>品牌字标</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===================== 4. 空间 ===================== -->
+      <section id="space" class="bw-section" aria-labelledby="t-space" data-principle="P0 P2">
+        <div class="bw-section__head">
+          <p class="bw-section__id">#space</p>
+          <h2 id="t-space" class="bw-title">空间</h2>
+          <p class="bw-caption bw-prose">4 为基数。聊天区低密度、付费明细中高密度，靠的是选择不同刻度，而不是发明新数值。</p>
+        </div>
+        <div class="bw-table-wrap">
+          <table class="bw-table">
+            <caption>间距刻度</caption>
+            <thead><tr><th scope="col">Token</th><th scope="col" class="bw-table__num">值</th><th scope="col">示意</th><th scope="col">典型用途</th></tr></thead>
+            <tbody>
+              <tr><td><code class="bw-code-inline">--bw-space-0_5</code></td><td class="bw-table__num">2</td><td><div class="bw-spec-bar" data-bw-width="--bw-space-0_5"></div></td><td>图标微调、焦点环偏移</td></tr>
+              <tr><td><code class="bw-code-inline">--bw-space-1</code></td><td class="bw-table__num">4</td><td><div class="bw-spec-bar" data-bw-width="--bw-space-1"></div></td><td>图标与文字</td></tr>
+              <tr><td><code class="bw-code-inline">--bw-space-2</code></td><td class="bw-table__num">8</td><td><div class="bw-spec-bar" data-bw-width="--bw-space-2"></div></td><td>按钮组、选择组</td></tr>
+              <tr><td><code class="bw-code-inline">--bw-space-3</code></td><td class="bw-table__num">12</td><td><div class="bw-spec-bar" data-bw-width="--bw-space-3"></div></td><td>气泡内边距（纵）、列表行</td></tr>
+              <tr><td><code class="bw-code-inline">--bw-space-4</code></td><td class="bw-table__num">16</td><td><div class="bw-spec-bar" data-bw-width="--bw-space-4"></div></td><td>气泡之间、卡片之间、页面边距</td></tr>
+              <tr><td><code class="bw-code-inline">--bw-space-5</code></td><td class="bw-table__num">20</td><td><div class="bw-spec-bar" data-bw-width="--bw-space-5"></div></td><td>卡片内边距</td></tr>
+              <tr><td><code class="bw-code-inline">--bw-space-6</code></td><td class="bw-table__num">24</td><td><div class="bw-spec-bar" data-bw-width="--bw-space-6"></div></td><td>弹窗内边距、页面分区</td></tr>
+              <tr><td><code class="bw-code-inline">--bw-space-8</code></td><td class="bw-table__num">32</td><td><div class="bw-spec-bar" data-bw-width="--bw-space-8"></div></td><td>时间线缩进</td></tr>
+              <tr><td><code class="bw-code-inline">--bw-space-10</code></td><td class="bw-table__num">40</td><td><div class="bw-spec-bar" data-bw-width="--bw-space-10"></div></td><td>空状态留白</td></tr>
+              <tr><td><code class="bw-code-inline">--bw-space-12</code></td><td class="bw-table__num">48</td><td><div class="bw-spec-bar" data-bw-width="--bw-space-12"></div></td><td>文档章节（移动端）</td></tr>
+              <tr><td><code class="bw-code-inline">--bw-space-16</code></td><td class="bw-table__num">64</td><td><div class="bw-spec-bar" data-bw-width="--bw-space-16"></div></td><td>文档章节</td></tr>
+              <tr><td><code class="bw-code-inline">--bw-space-20</code></td><td class="bw-table__num">80</td><td><div class="bw-spec-bar" data-bw-width="--bw-space-20"></div></td><td>页尾留白</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="bw-grid bw-grid--3">
+          <article class="bw-card bw-stack bw-stack--2"><span class="bw-label">组件内 · 1–5</span><p class="bw-text">图标与文字 4，控件内边距 12–20。同一组件内只用两档。</p></article>
+          <article class="bw-card bw-stack bw-stack--2"><span class="bw-label">组件间 · 2–4</span><p class="bw-text">按钮组 8，气泡、卡片之间 16。等权选项间距必须相同。</p></article>
+          <article class="bw-card bw-stack bw-stack--2"><span class="bw-label">区块间 · 6–16</span><p class="bw-text">页面分区 24，文档章节 64。留白是“界面让位”的一部分。</p></article>
+        </div>
+      </section>
+
+      <!-- ===================== 5. 栅格与断点 ===================== -->
+      <section id="grid" class="bw-section" aria-labelledby="t-grid" data-principle="P0 P5">
+        <div class="bw-section__head">
+          <p class="bw-section__id">#grid</p>
+          <h2 id="t-grid" class="bw-title">栅格与断点</h2>
+          <p class="bw-caption bw-prose">移动优先：一列内容居中，最宽 480。媒体查询无法读取 CSS 变量，因此断点以常量登记在此处，样式文件里只允许出现这四个值。</p>
+        </div>
+        <div class="bw-grid bw-grid--2">
+          <div class="bw-table-wrap">
+            <table class="bw-table">
+              <caption>断点（常量）</caption>
+              <thead><tr><th scope="col">名称</th><th scope="col" class="bw-table__num">宽度</th><th scope="col">变化</th></tr></thead>
+              <tbody>
+                <tr><td><code class="bw-code-inline">bp-sm</code></td><td class="bw-table__num">480</td><td>三列网格变一列；说明列表变单列</td></tr>
+                <tr><td><code class="bw-code-inline">bp-md</code></td><td class="bw-table__num">768</td><td>发现页变宽屏多列；弹层从底部抽屉变居中弹窗</td></tr>
+                <tr><td><code class="bw-code-inline">bp-lg</code></td><td class="bw-table__num">1024</td><td>会话页出现记忆侧面板；文档站侧栏常驻</td></tr>
+                <tr><td><code class="bw-code-inline">bp-xl</code></td><td class="bw-table__num">1280</td><td>仅增加留白，不再增加列</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="bw-table-wrap">
+            <table class="bw-table">
+              <caption>布局常量（Token）</caption>
+              <thead><tr><th scope="col">Token</th><th scope="col" class="bw-table__num">值</th><th scope="col">说明</th></tr></thead>
+              <tbody>
+                <tr><td><code class="bw-code-inline">--bw-app-max</code></td><td class="bw-table__num">480</td><td>App 内容列</td></tr>
+                <tr><td><code class="bw-code-inline">--bw-panel-w</code></td><td class="bw-table__num">360</td><td>≥1024 侧面板</td></tr>
+                <tr><td><code class="bw-code-inline">--bw-sidebar-w</code></td><td class="bw-table__num">264</td><td>文档站侧栏</td></tr>
+                <tr><td><code class="bw-code-inline">--bw-content-max</code></td><td class="bw-table__num">1040</td><td>正文最大宽</td></tr>
+                <tr><td><code class="bw-code-inline">--bw-measure</code></td><td class="bw-table__num">640</td><td>最大行长</td></tr>
+                <tr><td><code class="bw-code-inline">--bw-header-h</code></td><td class="bw-table__num">56</td><td>顶栏高度</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="bw-table-wrap">
+          <table class="bw-table">
+            <caption>布局模板 T1–T5（示例见 <a href="components.html#templates">组件 · 布局模板</a>）</caption>
+            <thead><tr><th scope="col">模板</th><th scope="col">类</th><th scope="col">结构</th><th scope="col">用于</th></tr></thead>
+            <tbody>
+              <tr><td><span class="bw-tag">T1</span> App 单列</td><td><code class="bw-code-inline">.bw-app</code></td><td>顶栏（吸顶） / 主区 / 底部（吸底，含安全区）</td><td>S2 聊天、S5 付费</td></tr>
+              <tr><td><span class="bw-tag">T2</span> App 分栏</td><td><code class="bw-code-inline">.bw-app--split</code> + <code class="bw-code-inline">.bw-app__panel</code></td><td>≥1024：主区 + 360 侧面板（记忆、分支）；以下面板隐藏，改由弹层进入</td><td>S3 回归、S4 分支与纠正</td></tr>
+              <tr><td><span class="bw-tag">T3</span> App 宽屏发现</td><td><code class="bw-code-inline">.bw-app--wide</code></td><td>≥768 扩展到 1040，角色卡多列</td><td>多列浏览（预留）</td></tr>
+              <tr><td><span class="bw-tag">T5</span> 沉浸全屏</td><td><code class="bw-code-inline">.bw-immersive</code></td><td>一屏一个人，整屏吸附上下滑；纯黑固定标签栏；宽屏居中 480，两侧同图模糊</td><td>S1 发现首页</td></tr>
+              <tr><td><span class="bw-tag">T4</span> 文档站</td><td><code class="bw-code-inline">.bw-docs</code></td><td>侧栏（移动端抽屉） / 顶栏 / 正文</td><td>本规范站</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===================== 6. 圆角、边框、阴影 ===================== -->
+      <section id="shape" class="bw-section" aria-labelledby="t-shape" data-principle="P0 P4">
+        <div class="bw-section__head">
+          <p class="bw-section__id">#shape</p>
+          <h2 id="t-shape" class="bw-title">圆角、边框、阴影</h2>
+          <p class="bw-caption bw-prose">大圆角配玻璃，让界面柔和但不幼态；层级首先靠材质（玻璃透明度），其次才是阴影；发光只给两样东西：主操作和记忆。</p>
+        </div>
+
+        <div class="bw-subsection">
+          <h3 class="bw-heading">圆角刻度</h3>
+          <div class="bw-demo">
+            <div class="bw-stack bw-stack--2"><div class="bw-spec-box" data-bw-radius="--bw-radius-xs"></div><code class="bw-swatch__token">xs · 6 · 气泡锚角</code></div>
+            <div class="bw-stack bw-stack--2"><div class="bw-spec-box" data-bw-radius="--bw-radius-sm"></div><code class="bw-swatch__token">sm · 10 · 导航项</code></div>
+            <div class="bw-stack bw-stack--2"><div class="bw-spec-box" data-bw-radius="--bw-radius-md"></div><code class="bw-swatch__token">md · 16 · 输入、选项</code></div>
+            <div class="bw-stack bw-stack--2"><div class="bw-spec-box" data-bw-radius="--bw-radius-lg"></div><code class="bw-swatch__token">lg · 22 · 气泡、小卡</code></div>
+            <div class="bw-stack bw-stack--2"><div class="bw-spec-box" data-bw-radius="--bw-radius-xl"></div><code class="bw-swatch__token">xl · 28 · 卡片、弹窗</code></div>
+            <div class="bw-stack bw-stack--2"><div class="bw-spec-box" data-bw-radius="--bw-radius-pill"></div><code class="bw-swatch__token">pill · 按钮、标签</code></div>
+          </div>
+        </div>
+
+        <div class="bw-subsection">
+          <h3 class="bw-heading">气泡锚角：指向说话的人</h3>
+          <div class="bw-demo bw-demo--stack bw-demo--narrow">
+            <div class="bw-thread">
+              <div class="bw-message bw-message--character"><p class="bw-bubble bw-bubble--character">左上角收成 6：这是沈砚说的。</p></div>
+              <div class="bw-message bw-message--user"><p class="bw-bubble bw-bubble--user">右上角收成 6：这是我说的。</p></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bw-grid bw-grid--2">
+          <div class="bw-table-wrap">
+            <table class="bw-table">
+              <caption>边框</caption>
+              <thead><tr><th scope="col">Token</th><th scope="col" class="bw-table__num">值</th><th scope="col">用途</th></tr></thead>
+              <tbody>
+                <tr><td><code class="bw-code-inline">--bw-border-1</code></td><td class="bw-table__num">1</td><td>玻璃描边、分隔线、控件描边</td></tr>
+                <tr><td><code class="bw-code-inline">--bw-border-2</code></td><td class="bw-table__num">2</td><td>焦点环、记忆线、选中强调</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="bw-table-wrap">
+            <table class="bw-table">
+              <caption>玻璃材质三级</caption>
+              <thead><tr><th scope="col">Token</th><th scope="col">用途</th></tr></thead>
+              <tbody>
+                <tr><td><code class="bw-code-inline">--bw-glass-1</code></td><td>卡片、角色气泡、分支项</td></tr>
+                <tr><td><code class="bw-code-inline">--bw-glass-2</code></td><td>按钮、回顾卡、标签栏</td></tr>
+                <tr><td><code class="bw-code-inline">--bw-glass-solid</code></td><td>输入框、规则、表格、弹窗、Toast：可读性优先</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="bw-subsection">
+          <h3 class="bw-heading">阴影与发光</h3>
+          <div class="bw-demo">
+            <div class="bw-stack bw-stack--2"><div class="bw-spec-box" data-bw-radius="--bw-radius-lg" data-bw-shadow="--bw-shadow-1"></div><code class="bw-swatch__token">shadow-1 · 卡片</code></div>
+            <div class="bw-stack bw-stack--2"><div class="bw-spec-box" data-bw-radius="--bw-radius-lg" data-bw-shadow="--bw-shadow-2"></div><code class="bw-swatch__token">shadow-2 · 浮层</code></div>
+            <div class="bw-stack bw-stack--2"><div class="bw-spec-box" data-bw-radius="--bw-radius-lg" data-bw-shadow="--bw-shadow-3"></div><code class="bw-swatch__token">shadow-3 · 弹窗</code></div>
+            <div class="bw-stack bw-stack--2"><div class="bw-spec-box" data-bw-radius="--bw-radius-pill" data-bw-shadow="--bw-glow-accent"></div><code class="bw-swatch__token">glow-accent · 主按钮</code></div>
+            <div class="bw-stack bw-stack--2"><div class="bw-spec-box" data-bw-radius="--bw-radius-pill" data-bw-shadow="--bw-glow-memory"></div><code class="bw-swatch__token">glow-memory · 记忆</code></div>
+          </div>
+          <div class="bw-demo">
+            <div class="bw-card"><span class="bw-label">.bw-card</span><p class="bw-text">玻璃 1</p></div>
+            <div class="bw-card bw-card--strong"><span class="bw-label">.bw-card--strong</span><p class="bw-text">玻璃 2</p></div>
+            <div class="bw-card bw-card--solid"><span class="bw-label">.bw-card--solid</span><p class="bw-text">实底玻璃</p></div>
+          </div>
+        </div>
+
+        <div class="bw-rule-grid">
+          <div class="bw-rule bw-rule--do">
+            <p class="bw-rule__title"><svg class="bw-icon bw-icon--sm" aria-hidden="true"><use href="assets/icons.svg#check"/></svg>这样用</p>
+            <ul>
+              <li>玻璃最多叠两层：页面 → 卡片 → 卡片里的控件</li>
+              <li>需要认真读的内容（规则、表格、输入）用实底玻璃</li>
+              <li>发光只给主按钮和记忆</li>
+            </ul>
+          </div>
+          <div class="bw-rule bw-rule--dont">
+            <p class="bw-rule__title"><svg class="bw-icon bw-icon--sm" aria-hidden="true"><use href="assets/icons.svg#close"/></svg>不要这样</p>
+            <ul>
+              <li>玻璃卡片里再放玻璃卡片</li>
+              <li>给价格、套餐加发光</li>
+              <li>自创阴影值或霓虹描边</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== 7. 图标与图形 ===================== -->
+      <section id="icon" class="bw-section" aria-labelledby="t-icon" data-principle="P1 P3 P4 P5 P6">
+        <div class="bw-section__head">
+          <p class="bw-section__id">#icon</p>
+          <h2 id="t-icon" class="bw-title">图标与图形</h2>
+          <p class="bw-caption bw-prose">线性图标，24 栅格，1.6 描边，圆头圆角，颜色继承 <code class="bw-code-inline">currentColor</code>。尺寸只有 16 / 20 / 24 三档（<code class="bw-code-inline">.bw-icon--sm</code> / 默认 / <code class="bw-code-inline">--lg</code>）。装饰性图标加 <code class="bw-code-inline">aria-hidden="true"</code>，单独成按钮时必须有 <code class="bw-code-inline">aria-label</code>。</p>
+        </div>
+
+        <div class="bw-subsection">
+          <h3 class="bw-heading">六个专属母题</h3>
+          <div class="bw-table-wrap">
+            <table class="bw-table">
+              <thead><tr><th scope="col">图标</th><th scope="col">id</th><th scope="col">含义</th><th scope="col">原则</th></tr></thead>
+              <tbody>
+                <tr><td><svg class="bw-icon bw-icon--lg bw-memory-text" aria-hidden="true"><use href="assets/icons.svg#bookmark"/></svg></td><td><code class="bw-code-inline">bookmark</code></td><td>记忆：被记住的一句话</td><td>P3</td></tr>
+                <tr><td><svg class="bw-icon bw-icon--lg bw-memory-text" aria-hidden="true"><use href="assets/icons.svg#knot"/></svg></td><td><code class="bw-code-inline">knot</code></td><td>连续：存档、约定、接得上</td><td>P5</td></tr>
+                <tr><td><svg class="bw-icon bw-icon--lg" aria-hidden="true"><use href="assets/icons.svg#fork"/></svg></td><td><code class="bw-code-inline">fork</code></td><td>分支：在这里分岔</td><td>P4</td></tr>
+                <tr><td><svg class="bw-icon bw-icon--lg" aria-hidden="true"><use href="assets/icons.svg#pen"/></svg></td><td><code class="bw-code-inline">pen</code></td><td>纠正：这不对，改成…</td><td>P3 P4</td></tr>
+                <tr><td><svg class="bw-icon bw-icon--lg" aria-hidden="true"><use href="assets/icons.svg#receipt"/></svg></td><td><code class="bw-code-inline">receipt</code></td><td>透明扣费：每一笔都能查</td><td>P6</td></tr>
+                <tr><td><svg class="bw-icon bw-icon--lg bw-memory-text" aria-hidden="true"><use href="assets/icons.svg#anchor"/></svg></td><td><code class="bw-code-inline">anchor</code></td><td>人设锚点：换了引擎也不变的部分</td><td>P1</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="bw-subsection">
+          <h3 class="bw-heading">图标库 · assets/icons.svg</h3>
+          <div class="bw-swatch-grid">
+            <div class="bw-card bw-card--compact bw-stack bw-stack--2"><svg class="bw-icon bw-icon--lg" aria-hidden="true"><use href="assets/icons.svg#bookmark"/></svg><code class="bw-swatch__token">bookmark</code></div>
+            <div class="bw-card bw-card--compact bw-stack bw-stack--2"><svg class="bw-icon bw-icon--lg" aria-hidden="true"><use href="assets/icons.svg#knot"/></svg><code class="bw-swatch__token">knot</code></div>
+            <div class="bw-card bw-card--compact bw-stack bw-stack--2"><svg class="bw-icon bw-icon--lg" aria-hidden="true"><use href="assets/icons.svg#fork"/></svg><code class="bw-swatch__token">fork</code></div>
+            <div class="bw-card bw-card--compact bw-stack bw-stack--2"><svg class="bw-icon bw-icon--lg" aria-hidden="true"><use href="assets/icons.svg#pen"/></svg><code class="bw-swatch__token">pen</code></div>
+            <div class="bw-card bw-card--compact bw-stack bw-stack--2"><svg class="bw-icon bw-icon--lg" aria-hidden="true"><use href="assets/icons.svg#receipt"/></svg><code class="bw-swatch__token">receipt</code></div>
+            <div class="bw-card bw-card--compact bw-stack bw-stack--2"><svg class="bw-icon bw-icon--lg" aria-hidden="true"><use href="assets/icons.svg#anchor"/></svg><code class="bw-swatch__token">anchor</code></div>
+            <div class="bw-card bw-card--compact bw-stack bw-stack--2"><svg class="bw-icon bw-icon--lg" aria-hidden="true"><use href="assets/icons.svg#check"/></svg><code class="bw-swatch__token">check</code></div>
+            <div class="bw-card bw-card--compact bw-stack bw-stack--2"><svg class="bw-icon bw-icon--lg" aria-hidden="true"><use href="assets/icons.svg#chevron-left"/></svg><code class="bw-swatch__token">chevron-left</code></div>
+            <div class="bw-card bw-card--compact bw-stack bw-stack--2"><svg class="bw-icon bw-icon--lg" aria-hidden="true"><use href="assets/icons.svg#chevron-right"/></svg><code class="bw-swatch__token">chevron-right</code></div>
+            <div class="bw-card bw-card--compact bw-stack bw-stack--2"><svg class="bw-icon bw-icon--lg" aria-hidden="true"><use href="assets/icons.svg#chevron-down"/></svg><code class="bw-swatch__token">chevron-down</code></div>
+            <div class="bw-card bw-card--compact bw-stack bw-stack--2"><svg class="bw-icon bw-icon--lg" aria-hidden="true"><use href="assets/icons.svg#arrow-up"/></svg><code class="bw-swatch__token">arrow-up</code></div>
+            <div class="bw-card bw-card--compact bw-stack bw-stack--2"><svg class="bw-icon bw-icon--lg" aria-hidden="true"><use href="assets/icons.svg#arrow-down"/></svg><code class="bw-swatch__token">arrow-down</code></div>
+            <div class="bw-card bw-card--compact bw-stack bw-stack--2"><svg class="bw-icon bw-icon--lg" aria-hidden="true"><use href="assets/icons.svg#plus"/></svg><code class="bw-swatch__token">plus</code></div>
+            <div class="bw-card bw-card--compact bw-stack bw-stack--2"><svg class="bw-icon bw-icon--lg" aria-hidden="true"><use href="assets/icons.svg#close"/></svg><code class="bw-swatch__token">close</code></div>
+            <div class="bw-card bw-card--compact bw-stack bw-stack--2"><svg class="bw-icon bw-icon--lg" aria-hidden="true"><use href="assets/icons.svg#info"/></svg><code class="bw-swatch__token">info</code></div>
+            <div class="bw-card bw-card--compact bw-stack bw-stack--2"><svg class="bw-icon bw-icon--lg" aria-hidden="true"><use href="assets/icons.svg#alert"/></svg><code class="bw-swatch__token">alert</code></div>
+            <div class="bw-card bw-card--compact bw-stack bw-stack--2"><svg class="bw-icon bw-icon--lg" aria-hidden="true"><use href="assets/icons.svg#alert-circle"/></svg><code class="bw-swatch__token">alert-circle</code></div>
+            <div class="bw-card bw-card--compact bw-stack bw-stack--2"><svg class="bw-icon bw-icon--lg" aria-hidden="true"><use href="assets/icons.svg#refresh"/></svg><code class="bw-swatch__token">refresh</code></div>
+            <div class="bw-card bw-card--compact bw-stack bw-stack--2"><svg class="bw-icon bw-icon--lg" aria-hidden="true"><use href="assets/icons.svg#continue"/></svg><code class="bw-swatch__token">continue</code></div>
+            <div class="bw-card bw-card--compact bw-stack bw-stack--2"><svg class="bw-icon bw-icon--lg" aria-hidden="true"><use href="assets/icons.svg#compass"/></svg><code class="bw-swatch__token">compass</code></div>
+            <div class="bw-card bw-card--compact bw-stack bw-stack--2"><svg class="bw-icon bw-icon--lg" aria-hidden="true"><use href="assets/icons.svg#chat"/></svg><code class="bw-swatch__token">chat</code></div>
+            <div class="bw-card bw-card--compact bw-stack bw-stack--2"><svg class="bw-icon bw-icon--lg" aria-hidden="true"><use href="assets/icons.svg#user"/></svg><code class="bw-swatch__token">user</code></div>
+            <div class="bw-card bw-card--compact bw-stack bw-stack--2"><svg class="bw-icon bw-icon--lg" aria-hidden="true"><use href="assets/icons.svg#moon"/></svg><code class="bw-swatch__token">moon</code></div>
+            <div class="bw-card bw-card--compact bw-stack bw-stack--2"><svg class="bw-icon bw-icon--lg" aria-hidden="true"><use href="assets/icons.svg#sun"/></svg><code class="bw-swatch__token">sun</code></div>
+            <div class="bw-card bw-card--compact bw-stack bw-stack--2"><svg class="bw-icon bw-icon--lg" aria-hidden="true"><use href="assets/icons.svg#copy"/></svg><code class="bw-swatch__token">copy</code></div>
+            <div class="bw-card bw-card--compact bw-stack bw-stack--2"><svg class="bw-icon bw-icon--lg" aria-hidden="true"><use href="assets/icons.svg#menu"/></svg><code class="bw-swatch__token">menu</code></div>
+            <div class="bw-card bw-card--compact bw-stack bw-stack--2"><svg class="bw-icon bw-icon--lg" aria-hidden="true"><use href="assets/icons.svg#trash"/></svg><code class="bw-swatch__token">trash</code></div>
+            <div class="bw-card bw-card--compact bw-stack bw-stack--2"><svg class="bw-icon bw-icon--lg" aria-hidden="true"><use href="assets/icons.svg#clock"/></svg><code class="bw-swatch__token">clock</code></div>
+            <div class="bw-card bw-card--compact bw-stack bw-stack--2"><svg class="bw-icon bw-icon--lg" aria-hidden="true"><use href="assets/icons.svg#shield"/></svg><code class="bw-swatch__token">shield</code></div>
+            <div class="bw-card bw-card--compact bw-stack bw-stack--2"><svg class="bw-icon bw-icon--lg" aria-hidden="true"><use href="assets/icons.svg#more"/></svg><code class="bw-swatch__token">more</code></div>
+            <div class="bw-card bw-card--compact bw-stack bw-stack--2"><svg class="bw-icon bw-icon--lg" aria-hidden="true"><use href="assets/icons.svg#pause"/></svg><code class="bw-swatch__token">pause</code></div>
+            <div class="bw-card bw-card--compact bw-stack bw-stack--2"><svg class="bw-icon bw-icon--lg" aria-hidden="true"><use href="assets/icons.svg#download"/></svg><code class="bw-swatch__token">download</code></div>
+          </div>
+        </div>
+
+        <div class="bw-subsection">
+          <h3 class="bw-heading">图形语言：一根线、暮光、颗粒</h3>
+          <div class="bw-grid bw-grid--2">
+            <div class="bw-demo bw-demo--stack">
+              <p class="bw-label">一根线 · 共同经历连成一条线（P5）</p>
+              <ol class="bw-timeline">
+                <li class="bw-timeline__item is-key"><p class="bw-timeline__time">11 月 10 日</p><p class="bw-timeline__title">雨夜便利店，第一次见面</p></li>
+                <li class="bw-timeline__item"><p class="bw-timeline__time">11 月 13 日</p><p class="bw-timeline__title">你说你怕打雷</p></li>
+                <li class="bw-timeline__item is-active"><p class="bw-timeline__time">今天</p><p class="bw-timeline__title">他记得周五叫你起床</p></li>
+              </ol>
+            </div>
+            <div class="bw-demo bw-demo--stack">
+              <p class="bw-label">暮光环境光 + 颗粒（P0）</p>
+              <p class="bw-text">背景不是色块，是光：杏色从左上、玫瑰从右侧、梅紫从底部晕开，再叠一层很细的胶片颗粒（<code class="bw-code-inline">--bw-aurora</code> + <code class="bw-code-inline">--bw-texture-grain</code>）。玻璃透出这层光，界面就有了“天将黑未黑”的温度。</p>
+              <div class="bw-empty__art" aria-hidden="true"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bw-rule-grid">
+          <div class="bw-rule bw-rule--do">
+            <p class="bw-rule__title"><svg class="bw-icon bw-icon--sm" aria-hidden="true"><use href="assets/icons.svg#check"/></svg>这样用</p>
+            <ul>
+              <li>角色立绘是唯一的视觉主角</li>
+              <li>记忆相关图标用烛金，其他图标继承文字色</li>
+              <li>新增图标先进 icons.svg 并登记在本页</li>
+            </ul>
+          </div>
+          <div class="bw-rule bw-rule--dont">
+            <p class="bw-rule__title"><svg class="bw-icon bw-icon--sm" aria-hidden="true"><use href="assets/icons.svg#close"/></svg>不要这样</p>
+            <ul>
+              <li>用 ✨ 星星代表 AI</li>
+              <li>做通用的 AI 吉祥物</li>
+              <li>混用填充图标和线性图标</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== 8. 动效 ===================== -->
+      <section id="motion" class="bw-section" aria-labelledby="t-motion" data-principle="P2">
+        <div class="bw-section__head">
+          <p class="bw-section__id">#motion</p>
+          <h2 id="t-motion" class="bw-title">动效</h2>
+          <p class="bw-caption bw-prose">慢一拍、匀速、不回弹。动效只用来解释“发生了什么”，不用来表演。</p>
+        </div>
+        <div class="bw-table-wrap">
+          <table class="bw-table">
+            <caption>时长与曲线</caption>
+            <thead><tr><th scope="col">Token</th><th scope="col">值</th><th scope="col">用途</th></tr></thead>
+            <tbody>
+              <tr><td><code class="bw-code-inline">--bw-dur-fast</code></td><td class="bw-token-value">120ms</td><td>按下反馈</td></tr>
+              <tr><td><code class="bw-code-inline">--bw-dur-base</code></td><td class="bw-token-value">200ms</td><td>颜色、背景切换；遮罩淡入</td></tr>
+              <tr><td><code class="bw-code-inline">--bw-dur-slow</code></td><td class="bw-token-value">320ms</td><td>弹窗、Toast、抽屉进出；记忆点亮</td></tr>
+              <tr><td><code class="bw-code-inline">--bw-dur-spin</code></td><td class="bw-token-value">800ms</td><td>加载圈一周</td></tr>
+              <tr><td><code class="bw-code-inline">--bw-dur-breath</code></td><td class="bw-token-value">1600ms</td><td>正在输入、骨架屏、流式光标的呼吸周期</td></tr>
+              <tr><td><code class="bw-code-inline">--bw-ease-out</code></td><td class="bw-token-value">cubic-bezier(0.2, 0.8, 0.2, 1)</td><td>默认：进入、反馈</td></tr>
+              <tr><td><code class="bw-code-inline">--bw-ease-inout</code></td><td class="bw-token-value">cubic-bezier(0.4, 0, 0.2, 1)</td><td>循环：呼吸</td></tr>
+              <tr><td><code class="bw-code-inline">--bw-press-scale</code> / <code class="bw-code-inline">--bw-lift</code></td><td class="bw-token-value">0.98 / -2px</td><td>按下缩放 / 卡片悬停上浮</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="bw-subsection">
+          <h3 class="bw-heading">演示</h3>
+          <div class="bw-demo bw-demo--stack">
+            <div class="bw-stack bw-stack--3">
+              <p class="bw-label">三档时长对比</p>
+              <div class="bw-spec-bar" data-bw-dur="--bw-dur-fast"></div>
+              <div class="bw-spec-bar" data-bw-dur="--bw-dur-base"></div>
+              <div class="bw-spec-bar" data-bw-dur="--bw-dur-slow"></div>
+              <div class="bw-cluster"><button class="bw-btn bw-btn--secondary bw-btn--sm" type="button" data-bw-play-duration>播放 120 / 200 / 320ms</button></div>
+            </div>
+            <hr class="bw-divider">
+            <div class="bw-cluster bw-cluster--3">
+              <button id="motion-chip" class="bw-memory-chip is-new" type="button"><svg class="bw-icon bw-icon--sm" aria-hidden="true"><use href="assets/icons.svg#bookmark"/></svg>想起了：周五面试</button>
+              <button class="bw-btn bw-btn--ghost bw-btn--sm" type="button" data-bw-replay="motion-chip" data-class="is-new">重放记忆点亮</button>
+            </div>
+            <div class="bw-cluster bw-cluster--3">
+              <div class="bw-typing" role="status" aria-label="沈砚正在输入"><i></i><i></i><i></i></div>
+              <span class="bw-caption">正在输入：1600ms 匀速呼吸，不伪造打字延迟</span>
+            </div>
+            <div class="bw-cluster bw-cluster--3">
+              <button class="bw-btn bw-btn--primary" type="button" data-bw-demo-loading>点我看加载态</button>
+              <button class="bw-btn bw-btn--secondary" type="button" data-bw-open="motion-dialog">打开弹窗</button>
+              <button class="bw-btn bw-btn--secondary" type="button" data-bw-demo-toast="已记住：你怕打雷。之后的对话会按这个来。" data-type="memory">弹出记忆 Toast</button>
+            </div>
+          </div>
+        </div>
+
+        <dialog id="motion-dialog" class="bw-modal" aria-labelledby="motion-dialog-title">
+          <div class="bw-modal__header">
+            <h3 id="motion-dialog-title" class="bw-modal__title">弹窗进入：320ms 上浮淡入</h3>
+            <button class="bw-icon-btn bw-icon-btn--sm" type="button" data-bw-close aria-label="关闭"><svg class="bw-icon" aria-hidden="true"><use href="assets/icons.svg#close"/></svg></button>
+          </div>
+          <div class="bw-modal__body"><p>遮罩 200ms 淡入，面板上浮 8 像素、320ms、缓出，没有回弹。按 Esc 或点遮罩也能关闭，焦点回到触发按钮。</p></div>
+          <div class="bw-modal__footer"><button class="bw-btn bw-btn--secondary" type="button" data-bw-close>知道了</button></div>
+        </dialog>
+
+        <div class="bw-rule-grid">
+          <div class="bw-rule bw-rule--do">
+            <p class="bw-rule__title"><svg class="bw-icon bw-icon--sm" aria-hidden="true"><use href="assets/icons.svg#check"/></svg>这样用</p>
+            <ul>
+              <li>回复到了就显示，流式输出逐字出现</li>
+              <li>记忆写入成功时只点亮一次</li>
+              <li>系统开启“减弱动态效果”时，所有动画降到瞬时，循环动画改为静态</li>
+            </ul>
+          </div>
+          <div class="bw-rule bw-rule--dont">
+            <p class="bw-rule__title"><svg class="bw-icon bw-icon--sm" aria-hidden="true"><use href="assets/icons.svg#close"/></svg>不要这样</p>
+            <ul>
+              <li>弹簧回弹、抖动、晃动</li>
+              <li>为了“像真人”故意延迟显示回复</li>
+              <li>付费成功放礼花、金光、全屏动画</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== 9. 可访问性 ===================== -->
+      <section id="a11y" class="bw-section" aria-labelledby="t-a11y" data-principle="P2 P4 P6">
+        <div class="bw-section__head">
+          <p class="bw-section__id">#a11y</p>
+          <h2 id="t-a11y" class="bw-title">可访问性</h2>
+          <p class="bw-caption bw-prose">玻璃和环境光很容易牺牲可读性，所以这里的规则比视觉规则优先。每个页面上线前按此清单逐条检查。</p>
+        </div>
+        <div class="bw-grid bw-grid--2">
+          <article class="bw-card bw-stack bw-stack--3">
+            <h3 class="bw-subheading">看得清</h3>
+            <ul class="bw-checklist">
+              <li class="bw-checklist__item"><svg class="bw-icon bw-icon--sm" aria-hidden="true"><use href="assets/icons.svg#check"/></svg>文字与背景对比度 ≥ 4.5:1，深浅两套都实测（见 <a href="#color">色彩 · 对比度实测</a>）</li>
+              <li class="bw-checklist__item"><svg class="bw-icon bw-icon--sm" aria-hidden="true"><use href="assets/icons.svg#check"/></svg>需要认真读的内容放在实底玻璃上</li>
+              <li class="bw-checklist__item"><svg class="bw-icon bw-icon--sm" aria-hidden="true"><use href="assets/icons.svg#check"/></svg>颜色不单独表意：状态必须有图标和文字</li>
+              <li class="bw-checklist__item"><svg class="bw-icon bw-icon--sm" aria-hidden="true"><use href="assets/icons.svg#check"/></svg>支持系统文字放大到 200% 不截断；聊天正文最小 16</li>
+            </ul>
+          </article>
+          <article class="bw-card bw-stack bw-stack--3">
+            <h3 class="bw-subheading">点得到</h3>
+            <ul class="bw-checklist">
+              <li class="bw-checklist__item"><svg class="bw-icon bw-icon--sm" aria-hidden="true"><use href="assets/icons.svg#check"/></svg>点击区 ≥ 44 × 44（<code class="bw-code-inline">--bw-size-tap</code>）</li>
+              <li class="bw-checklist__item"><svg class="bw-icon bw-icon--sm" aria-hidden="true"><use href="assets/icons.svg#check"/></svg>等权选项的尺寸和间距完全一致</li>
+              <li class="bw-checklist__item"><svg class="bw-icon bw-icon--sm" aria-hidden="true"><use href="assets/icons.svg#check"/></svg>底部操作区预留安全区 <code class="bw-code-inline">env(safe-area-inset-bottom)</code></li>
+            </ul>
+          </article>
+          <article class="bw-card bw-stack bw-stack--3">
+            <h3 class="bw-subheading">键盘可用</h3>
+            <ul class="bw-checklist">
+              <li class="bw-checklist__item"><svg class="bw-icon bw-icon--sm" aria-hidden="true"><use href="assets/icons.svg#check"/></svg>每页第一个焦点是“跳到正文”</li>
+              <li class="bw-checklist__item"><svg class="bw-icon bw-icon--sm" aria-hidden="true"><use href="assets/icons.svg#check"/></svg>焦点环 2px <code class="bw-code-inline">--bw-color-focus</code>，偏移 3px，任何组件不得去掉</li>
+              <li class="bw-checklist__item"><svg class="bw-icon bw-icon--sm" aria-hidden="true"><use href="assets/icons.svg#check"/></svg>Tab 顺序与视觉顺序一致；弹窗打开时焦点进入，Esc 关闭并回到触发点</li>
+              <li class="bw-checklist__item"><svg class="bw-icon bw-icon--sm" aria-hidden="true"><use href="assets/icons.svg#check"/></svg>单选组用原生 radio 或 <code class="bw-code-inline">aria-pressed</code> / <code class="bw-code-inline">aria-current</code> 标明选中</li>
+            </ul>
+          </article>
+          <article class="bw-card bw-stack bw-stack--3">
+            <h3 class="bw-subheading">读屏能懂</h3>
+            <ul class="bw-checklist">
+              <li class="bw-checklist__item"><svg class="bw-icon bw-icon--sm" aria-hidden="true"><use href="assets/icons.svg#check"/></svg>页面有 header / main / nav 地标，且只有一个 h1</li>
+              <li class="bw-checklist__item"><svg class="bw-icon bw-icon--sm" aria-hidden="true"><use href="assets/icons.svg#check"/></svg>对话流 <code class="bw-code-inline">role="log"</code>，新消息自动播报</li>
+              <li class="bw-checklist__item"><svg class="bw-icon bw-icon--sm" aria-hidden="true"><use href="assets/icons.svg#check"/></svg>Toast 用 <code class="bw-code-inline">aria-live</code>：普通 status，出错 alert</li>
+              <li class="bw-checklist__item"><svg class="bw-icon bw-icon--sm" aria-hidden="true"><use href="assets/icons.svg#check"/></svg>弹窗用原生 <code class="bw-code-inline">&lt;dialog&gt;</code> + <code class="bw-code-inline">aria-labelledby</code></li>
+              <li class="bw-checklist__item"><svg class="bw-icon bw-icon--sm" aria-hidden="true"><use href="assets/icons.svg#check"/></svg>纯图标按钮必须有 <code class="bw-code-inline">aria-label</code>；输入框必须有关联标签</li>
+            </ul>
+          </article>
+        </div>
+        <div class="bw-notice bw-notice--info">
+          <svg class="bw-icon" aria-hidden="true"><use href="assets/icons.svg#info"/></svg>
+          <div class="bw-notice__body"><p class="bw-notice__title">减少动态</p><p>components.css 里的 <code class="bw-code-inline">prefers-reduced-motion</code> 规则会把所有动画和过渡压到瞬时；呼吸类循环动画改为静态半透明。</p></div>
+        </div>
+      </section>
+
+      <!-- ===================== 10. 文案与语气 ===================== -->
+      <section id="voice" class="bw-section" aria-labelledby="t-voice" data-principle="P0 P4 P6">
+        <div class="bw-section__head">
+          <p class="bw-section__id">#voice</p>
+          <h2 id="t-voice" class="bw-title">文案与语气</h2>
+          <p class="bw-caption bw-prose">角色怎么说话由人设决定，系统不干预。系统自己说话时，平实、短句、先讲后果。两种声音永远不混用。</p>
+        </div>
+        <div class="bw-grid bw-grid--2">
+          <article class="bw-card bw-stack bw-stack--3">
+            <span class="bw-tag bw-tag--accent">角色声部</span>
+            <dl class="bw-meta-list">
+              <dt>谁写</dt><dd>人设 + 模型</dd>
+              <dt>出现在</dt><dd>气泡、开场台词、回顾摘要</dd>
+              <dt>系统能做</dt><dd>什么都不改，只负责显示稳定</dd>
+            </dl>
+          </article>
+          <article class="bw-card bw-stack bw-stack--3">
+            <span class="bw-tag">系统声部</span>
+            <dl class="bw-meta-list">
+              <dt>谁写</dt><dd>产品</dd>
+              <dt>出现在</dt><dd>系统细行、通知、Toast、付费页、弹窗</dd>
+              <dt>规则</dt><dd>短句；先讲后果再讲操作；称呼“你”；不用“亲”；不用感叹号造情绪；不用表情</dd>
+            </dl>
+          </article>
+        </div>
+        <div class="bw-table-wrap">
+          <table class="bw-table">
+            <caption>正反例</caption>
+            <thead><tr><th scope="col">场景</th><th scope="col">这样说</th><th scope="col">不要这样说</th><th scope="col">原则</th></tr></thead>
+            <tbody>
+              <tr><td>回复没生成完</td><td>这条没生成完，不扣。要续写吗？</td><td>哎呀出错啦～请稍后再试！</td><td>P2 P6</td></tr>
+              <tr><td>纠正记忆</td><td>已改为“你怕打雷”，之后的对话会按这个来。</td><td>感谢反馈！AI 会努力学习的～</td><td>P3</td></tr>
+              <tr><td>额度快用完</td><td>今天还剩 6 条，明早 6:00 恢复。</td><td>额度告急！马上充值继续心动！</td><td>P6</td></tr>
+              <tr><td>额度用完</td><td>今天的 30 条用完了。这段对话已存好，明早接着聊，或者现在续上。</td><td>沈砚：“你不充值，我就要消失了……”</td><td>P0 P6</td></tr>
+              <tr><td>拒绝邀约</td><td>（选项）今天先不了</td><td>（选项）残忍拒绝 TA</td><td>P4</td></tr>
+              <tr><td>模型更新</td><td>引擎已更新。沈砚的人设和 23 条记忆保持不变。</td><td>全新升级！更聪明的 TA 来啦！</td><td>P1</td></tr>
+              <tr><td>存档</td><td>已存档 · 刚刚</td><td>（不显示，出了问题才提示）</td><td>P5</td></tr>
+              <tr><td>角色下架</td><td>沈砚将在 12 月 31 日停止更新。你们的存档会一直保留，可以随时导出。</td><td>该角色已下架。</td><td>P5 P6</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="bw-notice bw-notice--danger">
+          <svg class="bw-icon" aria-hidden="true"><use href="assets/icons.svg#alert-circle"/></svg>
+          <div class="bw-notice__body"><p class="bw-notice__title">硬规则</p><p>付费、扣费、错误、规则类信息只能用系统声部。绝不借角色的口吻催付、挽留或制造愧疚。</p></div>
+        </div>
+      </section>
+
+      <!-- ===================== 11. Token 表 ===================== -->
+      <section id="tokens" class="bw-section" aria-labelledby="t-tokens" data-principle="P0 P1 P2 P3 P4 P5 P6">
+        <div class="bw-section__head">
+          <p class="bw-section__id">#tokens</p>
+          <h2 id="t-tokens" class="bw-title">Token 表</h2>
+          <p class="bw-caption bw-prose">下表由 <code class="bw-code-inline">scripts/main.js</code> 在页面加载时直接读取 <code class="bw-code-inline">styles/tokens.css</code> 生成，所以永远和实现一致。当前共 <b><span data-bw-token-count>…</span></b> 个 Token。</p>
+        </div>
+        <div class="bw-grid bw-grid--2">
+          <article class="bw-card bw-stack bw-stack--3">
+            <h3 class="bw-subheading">命名</h3>
+            <p class="bw-text"><code class="bw-code-inline">--bw-{类别}-{角色}-{变体}</code>，例如 <code class="bw-code-inline">--bw-color-memory-soft</code>。原始色板（<code class="bw-code-inline">--bw-rose-400</code> 等）只能被语义 Token 引用，组件禁止直接使用。</p>
+          </article>
+          <article class="bw-card bw-stack bw-stack--3">
+            <h3 class="bw-subheading">检索</h3>
+            <p class="bw-text">tokens.css 和 components.css 的注释里写 <code class="bw-code-inline">@principle P3</code> / <code class="bw-code-inline">@scene S3</code>；HTML 用 <code class="bw-code-inline">data-principle</code> / <code class="bw-code-inline">data-scene</code>。搜编号就能找到一条原则的全部落点。</p>
+          </article>
+        </div>
+        <div class="bw-stack" data-bw-token-table="all"></div>
+      </section>
+    </main>
+  </div>
+</div>
+</body>
+</html>

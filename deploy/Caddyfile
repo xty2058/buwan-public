@@ -1,0 +1,12 @@
+{$BUWAN_DOMAIN} {
+	encode gzip
+	# Streaming replies (server-sent chunks) must not be buffered.
+	reverse_proxy app:8840 {
+		flush_interval -1
+		header_up Host {host}
+	}
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		-Server
+	}
+}

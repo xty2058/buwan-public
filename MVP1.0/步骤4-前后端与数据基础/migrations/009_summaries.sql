@@ -1,0 +1,3 @@
+CREATE TABLE conversation_summaries(id TEXT PRIMARY KEY,conversation_id TEXT NOT NULL REFERENCES conversations(id),version INTEGER NOT NULL,status TEXT NOT NULL CHECK(status IN ('active','superseded','invalidated')),covered_to INTEGER NOT NULL,items TEXT NOT NULL,reason TEXT NOT NULL,created_at INTEGER NOT NULL,UNIQUE(conversation_id,version));
+CREATE TABLE summary_sources(summary_id TEXT NOT NULL REFERENCES conversation_summaries(id),message_id TEXT NOT NULL REFERENCES messages(id),PRIMARY KEY(summary_id,message_id));
+CREATE TABLE summary_state(conversation_id TEXT PRIMARY KEY REFERENCES conversations(id),last_error TEXT,updated_at INTEGER NOT NULL);

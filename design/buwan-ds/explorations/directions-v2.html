@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>不晚 · 视觉方向 v2（高级 / 未来 / 温暖）</title>
+<style>
+/* 探索稿 v2：三个方向 × 三个不晚页面。字体只用 iOS 系统字体。 */
+:root{
+  --sys: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Helvetica Neue", sans-serif;
+  --sys-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", sans-serif;
+  --sys-rounded: ui-rounded, "SF Pro Rounded", -apple-system, "PingFang SC", sans-serif;
+  --sys-mono: ui-monospace, "SF Mono", Menlo, monospace;
+  --grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+*{box-sizing:border-box;margin:0}
+body{background:#0B0A0A;color:#EDE6E1;font:400 15px/1.6 var(--sys);-webkit-font-smoothing:antialiased}
+.wrap{max-width:1240px;margin:0 auto;padding:64px 24px 96px}
+.eyebrow{font:600 12px/1 var(--sys);letter-spacing:.16em;color:#9C918A}
+h1{font:600 40px/1.15 var(--sys-display);letter-spacing:-.02em;margin:12px 0 14px}
+.lede{color:#B3A9A2;max-width:780px}
+.refs{display:flex;flex-wrap:wrap;gap:8px;margin:24px 0 0}
+.refs a{font-size:13px;color:#E8DCD4;text-decoration:none;padding:6px 12px;border:1px solid #2E2928;border-radius:999px}
+.refs a:hover{border-color:#5A4F4B}
+.refs a:focus-visible{outline:2px solid #FFB38A;outline-offset:2px}
+
+.dir{margin-top:88px}
+.dir-head{display:grid;grid-template-columns:1.1fr 1fr;gap:32px;align-items:end;margin-bottom:28px}
+@media (max-width:860px){.dir-head{grid-template-columns:1fr}}
+.dir-head h2{font:600 30px/1.2 var(--sys-display);letter-spacing:-.015em;margin-top:8px}
+.dir-head .kw{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.dir-head .kw span{font-size:12px;padding:3px 10px;border-radius:999px;background:#1C1918;color:#CFC4BC}
+.dir-head ul{padding-left:18px;color:#B3A9A2;font-size:14px}
+.dir-head li b{color:#EDE6E1;font-weight:600}
+.phones{display:flex;gap:28px;justify-content:center;flex-wrap:wrap}
+.cap{font-size:12px;color:#8C827B;text-align:center;margin-top:10px;letter-spacing:.06em}
+
+/* ================= 手机外壳（共用结构） ================= */
+.phone{width:360px;height:760px;border-radius:44px;padding:8px;background:#000;box-shadow:0 0 0 1px #2a2626,0 30px 80px rgba(0,0,0,.5)}
+.screen{position:relative;width:100%;height:100%;border-radius:36px;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--sys);display:flex;flex-direction:column}
+.screen::before{content:"";position:absolute;inset:0;background:var(--bg-layer);pointer-events:none}
+.screen::after{content:"";position:absolute;inset:0;background-image:var(--grain);opacity:var(--grain-op);mix-blend-mode:overlay;pointer-events:none}
+.screen>*{position:relative;z-index:1}
+.status{display:flex;justify-content:space-between;align-items:center;padding:14px 26px 6px;font:600 14px/1 var(--sys);color:var(--text)}
+.status i{display:inline-block;width:24px;height:11px;border-radius:3px;border:1.5px solid currentColor;opacity:.9}
+.body{flex:1;padding:8px 18px 0;display:flex;flex-direction:column;gap:14px;overflow:hidden}
+.label{font:var(--label-font);letter-spacing:var(--label-spacing);text-transform:var(--label-transform);color:var(--text-3)}
+.surface{background:var(--surface);border:1px solid var(--surface-border);box-shadow:var(--surface-shadow);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border-radius:var(--r-card)}
+.btn{font:600 15px/1 var(--sys);border-radius:var(--r-btn);padding:14px 18px;border:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn:focus-visible{outline:2px solid var(--focus);outline-offset:3px}
+.btn-primary{background:var(--accent-fill);color:var(--on-accent);box-shadow:var(--accent-shadow)}
+.btn-ghost{background:var(--ghost-bg);color:var(--text);border:1px solid var(--surface-border)}
+.ico{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+
+/* 发现 */
+.top{display:flex;justify-content:space-between;align-items:center}
+.wordmark{font:600 19px/1 var(--sys-display);letter-spacing:var(--wm-spacing)}
+.me{width:32px;height:32px;border-radius:999px;background:var(--surface);border:1px solid var(--surface-border)}
+.hello h2{font:600 26px/1.25 var(--sys-display);letter-spacing:-.02em;margin-top:6px}
+.hero{padding:0;overflow:hidden}
+.portrait{position:relative;height:208px;background:var(--portrait-bg);overflow:hidden}
+.portrait svg{position:absolute;left:50%;bottom:-6px;transform:translateX(-50%);width:170px;fill:var(--silhouette)}
+.portrait .halo{position:absolute;inset:auto 0 0;height:60%;background:var(--portrait-fade)}
+.portrait .badge{position:absolute;left:14px;top:14px}
+.hero-body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:8px}
+.name-row{display:flex;align-items:baseline;gap:8px}
+.name{font:600 22px/1.2 var(--sys-display);letter-spacing:-.01em}
+.role{font-size:13px;color:var(--text-2)}
+.quote{font-size:15px;line-height:1.6;color:var(--text)}
+.tags{display:flex;gap:6px}
+.tag{font-size:12px;padding:3px 10px;border-radius:var(--r-tag);background:var(--tag-bg);color:var(--text-2);border:1px solid var(--tag-border)}
+.actions{display:grid;grid-template-columns:1.4fr 1fr;gap:8px;margin-top:4px}
+.minis{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mini{padding:12px;display:flex;gap:10px;align-items:center}
+.mini .dot{width:36px;height:36px;border-radius:var(--r-avatar);background:var(--mini-bg);flex:none}
+.mini b{display:block;font-size:14px;font-weight:600}
+.mini span{font-size:12px;color:var(--text-2)}
+.tabbar{margin:auto 14px 14px;display:flex;justify-content:space-around;padding:10px 6px;font-size:11px;color:var(--text-3)}
+.tabbar div{display:flex;flex-direction:column;align-items:center;gap:3px}
+.tabbar .on{color:var(--text)}
+
+/* 聊天 */
+.chat-head{display:flex;align-items:center;gap:10px;padding:4px 16px 10px}
+.av{width:36px;height:36px;border-radius:var(--r-avatar);background:var(--portrait-bg);flex:none}
+.chat-head .who b{font-size:16px;font-weight:600;display:block;line-height:1.2}
+.chat-head .who span{font-size:12px;color:var(--text-2)}
+.recap{padding:12px 14px;display:flex;flex-direction:column;gap:6px;border-left:var(--recap-edge)}
+.recap p{font-size:14px;line-height:1.55}
+.promise{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--mem)}
+.msg{max-width:84%;padding:10px 14px;font-size:15px;line-height:1.55}
+.msg.char{align-self:flex-start;background:var(--char-bg);border:1px solid var(--surface-border);border-radius:6px var(--r-bubble) var(--r-bubble) var(--r-bubble);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur)}
+.msg.user{align-self:flex-end;background:var(--user-bg);color:var(--user-text);border-radius:var(--r-bubble) 6px var(--r-bubble) var(--r-bubble)}
+.mem{align-self:flex-start;display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;color:var(--mem);background:var(--mem-bg);border:1px solid var(--mem-border);padding:3px 10px 3px 8px;border-radius:var(--r-tag);margin-top:-8px;box-shadow:var(--mem-glow)}
+.mem .ico{width:13px;height:13px}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.choices .btn{font-size:14px;padding:11px 8px;font-weight:500}
+.typing{display:flex;gap:5px;padding:4px 2px}
+.typing i{width:6px;height:6px;border-radius:999px;background:var(--text-3);animation:breath 1.6s ease-in-out infinite}
+.typing i:nth-child(2){animation-delay:.2s}.typing i:nth-child(3){animation-delay:.4s}
+@keyframes breath{0%,100%{opacity:.3}50%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.typing i{animation:none;opacity:.6}}
+.composer{margin:auto 12px 0;padding:8px 8px 8px 16px;display:flex;align-items:center;gap:8px;border-radius:var(--r-btn)}
+.composer input{flex:1;background:none;border:0;color:var(--text);font:400 15px var(--sys);outline:none}
+.composer input::placeholder{color:var(--text-3)}
+.send{width:36px;height:36px;border-radius:var(--r-btn);background:var(--accent-fill);color:var(--on-accent);display:grid;place-items:center;border:0}
+.sys{font-size:11px;color:var(--text-3);text-align:center;padding:8px 0 18px}
+
+/* 额度 */
+.pay-head{display:flex;align-items:center;gap:10px;padding:4px 18px 4px;font-size:16px;font-weight:600}
+.quota{padding:18px}
+.num{font:var(--num-font);letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.num small{font:500 14px var(--sys);color:var(--text-2);letter-spacing:0;margin-left:6px}
+.meter{height:6px;border-radius:999px;background:var(--meter-track);margin-top:12px;overflow:hidden}
+.meter i{display:block;height:100%;width:21%;border-radius:999px;background:var(--meter-fill)}
+.rules{padding:14px 16px;display:flex;flex-direction:column;gap:9px}
+.rules li{list-style:none;display:flex;gap:8px;font-size:14px;line-height:1.45}
+.rules li .ico{color:var(--ok);flex:none;margin-top:1px}
+.plans{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.plan{padding:14px;display:flex;flex-direction:column;gap:4px}
+.plan.sel{border:var(--sel-border);box-shadow:var(--sel-shadow)}
+.plan b{font-size:13px;font-weight:600;color:var(--text-2)}
+.plan .price{font:var(--price-font);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.plan span{font-size:12px;color:var(--text-2)}
+.pay-actions{display:flex;flex-direction:column;gap:8px;margin-top:auto;padding-bottom:6px}
+.fine{font-size:11px;color:var(--text-3);text-align:center;padding:4px 0 18px}
+
+/* ================= 方向 1：暮光玻璃 ================= */
+.t-glass{
+  --bg:#140C10;
+  --bg-layer:
+    radial-gradient(120% 60% at 0% 0%, rgba(255,150,96,.42), transparent 60%),
+    radial-gradient(90% 55% at 100% 18%, rgba(232,86,128,.38), transparent 62%),
+    radial-gradient(120% 60% at 50% 100%, rgba(120,44,120,.45), transparent 65%);
+  --grain-op:.16;
+  --text:#FCF2EC;--text-2:rgba(252,242,236,.72);--text-3:rgba(252,242,236,.5);
+  --surface:rgba(255,236,228,.08);--surface-border:rgba(255,255,255,.14);
+  --surface-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 12px 32px rgba(10,0,6,.35);
+  --blur:blur(22px) saturate(1.4);
+  --r-card:26px;--r-btn:999px;--r-tag:999px;--r-bubble:22px;--r-avatar:999px;
+  --accent-fill:linear-gradient(135deg,#FFC39B,#F57E98);--on-accent:#2B0F18;--accent-shadow:0 8px 24px rgba(245,126,152,.35);
+  --ghost-bg:rgba(255,255,255,.06);--focus:#FFD2B5;
+  --label-font:500 12px/1 var(--sys);--label-spacing:.04em;--label-transform:none;--wm-spacing:.08em;
+  --portrait-bg:radial-gradient(70% 80% at 50% 30%,#FFB48E 0%,#D4577A 45%,#4A1A3C 100%);
+  --silhouette:rgba(30,8,20,.55);--portrait-fade:linear-gradient(transparent,rgba(20,12,16,.0));
+  --tag-bg:rgba(255,255,255,.06);--tag-border:rgba(255,255,255,.1);
+  --mini-bg:radial-gradient(circle at 30% 30%,#FFC39B,#8C3A6A);
+  --char-bg:rgba(255,236,228,.09);--user-bg:#FCEDE6;--user-text:#2B1219;
+  --mem:#FFD9A8;--mem-bg:rgba(255,200,140,.12);--mem-border:rgba(255,210,160,.3);--mem-glow:0 0 18px rgba(255,190,120,.25);
+  --recap-edge:1px solid var(--surface-border);
+  --num-font:600 54px/1 var(--sys-display);--price-font:600 26px/1.1 var(--sys-display);
+  --meter-track:rgba(255,255,255,.1);--meter-fill:linear-gradient(90deg,#FFC39B,#F57E98);
+  --ok:#FFD9A8;--sel-border:1px solid rgba(255,195,155,.6);--sel-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 0 0 4px rgba(255,195,155,.12);
+  --chk-bg:#2A1520;
+}
+
+/* ================= 方向 2：晨光陶瓷 ================= */
+.t-porcelain{
+  --bg:#F5EFE8;
+  --bg-layer:
+    radial-gradient(90% 45% at 15% 0%, rgba(255,196,160,.75), transparent 65%),
+    radial-gradient(80% 45% at 100% 8%, rgba(218,200,245,.7), transparent 65%),
+    radial-gradient(100% 50% at 50% 100%, rgba(255,226,206,.6), transparent 70%);
+  --grain-op:.08;
+  --text:#221A16;--text-2:#6B5E56;--text-3:#75685F;
+  --surface:rgba(255,255,255,.66);--surface-border:rgba(255,255,255,.9);
+  --surface-shadow:0 1px 2px rgba(80,40,20,.05),0 14px 36px rgba(120,70,40,.10);
+  --blur:blur(18px) saturate(1.3);
+  --r-card:28px;--r-btn:18px;--r-tag:999px;--r-bubble:22px;--r-avatar:14px;
+  --accent-fill:#221A16;--on-accent:#FFF8F2;--accent-shadow:0 8px 20px rgba(34,26,22,.18);
+  --ghost-bg:rgba(255,255,255,.7);--focus:#B4532F;
+  --label-font:600 12px/1 var(--sys);--label-spacing:.02em;--label-transform:none;--wm-spacing:.02em;
+  --portrait-bg:linear-gradient(160deg,#FFD7BF 0%,#F2A88A 45%,#B7A0E0 100%);
+  --silhouette:rgba(255,255,255,.55);--portrait-fade:linear-gradient(transparent,rgba(255,255,255,0));
+  --tag-bg:rgba(255,255,255,.7);--tag-border:rgba(34,26,22,.06);
+  --mini-bg:linear-gradient(160deg,#FFD7BF,#B7A0E0);
+  --char-bg:rgba(255,255,255,.78);--user-bg:#221A16;--user-text:#FFF8F2;
+  --mem:#5B44A0;--mem-bg:rgba(150,125,225,.16);--mem-border:rgba(120,95,200,.2);--mem-glow:none;
+  --recap-edge:1px solid var(--surface-border);
+  --num-font:600 56px/1 var(--sys-rounded);--price-font:600 26px/1.1 var(--sys-rounded);
+  --meter-track:rgba(34,26,22,.08);--meter-fill:linear-gradient(90deg,#F2A88A,#B7A0E0);
+  --ok:#2F7A55;--sel-border:1.5px solid #221A16;--sel-shadow:0 14px 36px rgba(120,70,40,.14);
+  --chk-bg:#FBF7F3;
+}
+.t-porcelain .accent-word{color:#B4532F}
+
+/* ================= 方向 3：琥珀终端 ================= */
+.t-amber{
+  --bg:#0F0C09;
+  --bg-layer:
+    radial-gradient(80% 40% at 50% 0%, rgba(255,170,70,.16), transparent 70%),
+    repeating-linear-gradient(0deg, rgba(255,181,71,.035) 0 1px, transparent 1px 28px),
+    repeating-linear-gradient(90deg, rgba(255,181,71,.035) 0 1px, transparent 1px 28px);
+  --grain-op:.12;
+  --text:#F6E7D0;--text-2:#C2AE90;--text-3:#9C8A70;
+  --surface:rgba(255,181,71,.035);--surface-border:rgba(255,181,71,.24);
+  --surface-shadow:none;--blur:none;
+  --r-card:6px;--r-btn:6px;--r-tag:3px;--r-bubble:10px;--r-avatar:4px;
+  --accent-fill:#FFB547;--on-accent:#1A1006;--accent-shadow:0 0 24px rgba(255,181,71,.25);
+  --ghost-bg:transparent;--focus:#FFD596;
+  --label-font:500 11px/1 var(--sys-mono);--label-spacing:.12em;--label-transform:uppercase;--wm-spacing:.3em;
+  --portrait-bg:radial-gradient(60% 70% at 50% 40%,rgba(255,181,71,.35),rgba(255,181,71,.04) 70%),#120E0A;
+  --silhouette:rgba(255,200,120,.22);--portrait-fade:linear-gradient(transparent,rgba(15,12,9,.6));
+  --tag-bg:transparent;--tag-border:rgba(255,181,71,.3);
+  --mini-bg:radial-gradient(circle,rgba(255,181,71,.5),rgba(255,181,71,.05));
+  --char-bg:rgba(255,181,71,.05);--user-bg:#F6E7D0;--user-text:#1A1006;
+  --mem:#FFC870;--mem-bg:rgba(255,181,71,.1);--mem-border:rgba(255,181,71,.45);--mem-glow:none;
+  --recap-edge:2px solid #FFB547;
+  --num-font:500 52px/1 var(--sys-mono);--price-font:500 24px/1.1 var(--sys-mono);
+  --meter-track:rgba(255,181,71,.12);--meter-fill:#FFB547;
+  --ok:#FFC870;--sel-border:1px solid #FFB547;--sel-shadow:0 0 0 3px rgba(255,181,71,.12);
+  --chk-bg:#161009;
+}
+.t-amber .portrait::before{content:"";position:absolute;left:50%;top:48%;width:190px;height:190px;transform:translate(-50%,-50%);border:1px dashed rgba(255,181,71,.35);border-radius:999px}
+.t-amber .portrait::after{content:"";position:absolute;left:50%;top:48%;width:130px;height:130px;transform:translate(-50%,-50%);border:1px solid rgba(255,181,71,.25);border-radius:999px}
+.t-amber .surface{position:relative}
+.t-amber .hero::before,.t-amber .quota::before{content:"";position:absolute;inset:-1px;border-radius:6px;pointer-events:none;
+  background:linear-gradient(#FFB547,#FFB547) top left/10px 1px no-repeat,linear-gradient(#FFB547,#FFB547) top left/1px 10px no-repeat,
+             linear-gradient(#FFB547,#FFB547) bottom right/10px 1px no-repeat,linear-gradient(#FFB547,#FFB547) bottom right/1px 10px no-repeat;z-index:2}
+
+/* 对比表 */
+.check{margin-top:96px}
+.check h2{font:600 22px/1.3 var(--sys-display)}
+.check p{color:#9C918A;font-size:14px;margin:6px 0 16px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid #221E1D}
+th{color:#9C918A;font-weight:500;font-size:13px}
+td.n{font-variant-numeric:tabular-nums}
+.ok{color:#8FD3A8}.bad{color:#FF8A80}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <p class="eyebrow">不晚 · 视觉方向 v2</p>
+  <h1>高级、未来、温暖：三个新方向</h1>
+  <p class="lede">参考了下面这些开源和公开资料，从里面挑出能为“同一个人、记得对、接得上、由你决定”服务的手法，不照搬外观。每个方向都用同样的三个不晚页面来呈现：发现角色、日常聊天（含回顾和记忆）、额度与付费，方便横向比较。</p>
+  <nav class="refs" aria-label="参考来源">
+    <a href="https://developer.apple.com/videos/play/wwdc2023/10076/">Apple · 空间界面与玻璃材质</a>
+    <a href="https://www.wavespace.agency/blog/ui-design-trends">Liquid Glass / Calm design 趋势</a>
+    <a href="https://github.com/CristianOlivera1/Aura">Aura · 氛围渐变 + 颗粒（MIT）</a>
+    <a href="https://github.com/gsacco15/Gradient-UI">Gradient-UI · Oklab 渐变与颗粒</a>
+    <a href="https://opensourceui.in/components">opensourceui · 暖纸颗粒背景</a>
+    <a href="https://open-design.ai/plugins/design-system-futuristic/">OpenDesign · Futuristic 系统</a>
+    <a href="https://opendesigner.io/design-systems">OpenDesign · HUD / 暖调系统目录</a>
+    <a href="https://www.thelogocreative.co.uk/ai-companion-platforms-in-2026-why-millennial-habits-are-shaping-design/">AI 陪伴产品的设计张力</a>
+  </nav>
+  <div id="dirs"></div>
+
+  <section class="check">
+    <h2>对比度实测</h2>
+    <p>玻璃和半透明表面按其下方的实际底色近似计算。正文要求 ≥ 4.5:1。</p>
+    <table id="contrast"><thead><tr><th>方向</th><th>配对</th><th>比值</th><th>结论</th></tr></thead><tbody></tbody></table>
+  </section>
+</main>
+
+<script>
+const I = {
+  bookmark:'<svg class="ico" viewBox="0 0 24 24"><path d="M7 4h10v16l-5-3.5L7 20z"/></svg>',
+  back:'<svg class="ico" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>',
+  send:'<svg class="ico" viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></svg>',
+  check:'<svg class="ico" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  knot:'<svg class="ico" viewBox="0 0 24 24"><path d="M3 12h6a3 3 0 1 1 0 .01M15 12h6"/></svg>',
+  home:'<svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>',
+  chat:'<svg class="ico" viewBox="0 0 24 24"><path d="M5 6h14v10H10l-5 4z"/></svg>',
+  me:'<svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="9" r="3.5"/><path d="M5 20c1-4 4-6 7-6s6 2 7 6"/></svg>',
+};
+const silhouette = '<svg viewBox="0 0 200 230" aria-hidden="true"><circle cx="100" cy="86" r="44"/><path d="M14 230c8-64 46-98 86-98s78 34 86 98z"/></svg>';
+const status = '<div class="status"><span>22:12</span><i></i></div>';
+
+const discover = (labels) => `
+  ${status}
+  <div class="body">
+    <div class="top"><span class="wordmark">不晚</span><span class="me" aria-label="我的"></span></div>
+    <div class="hello"><p class="label">${labels.hello}</p><h2>今晚，想和谁<br>说说话？</h2></div>
+    <article class="surface hero">
+      <div class="portrait">${silhouette}<div class="halo"></div><span class="tag badge">首次见面</span></div>
+      <div class="hero-body">
+        <div class="name-row"><span class="name">沈砚</span><span class="role">律所新人 · 话少，记性很好</span></div>
+        <p class="quote">「又熬夜了？……行，我陪你到你睡着。」</p>
+        <div class="tags"><span class="tag">慢热</span><span class="tag">都市</span><span class="tag">长线剧情</span></div>
+        <div class="actions"><button class="btn btn-primary">开始聊</button><button class="btn btn-ghost">换个开场</button></div>
+      </div>
+    </article>
+    <div class="minis">
+      <div class="surface mini"><span class="dot"></span><div><b>林栖</b><span>花店店主</span></div></div>
+      <div class="surface mini"><span class="dot"></span><div><b>陆迟</b><span>夜班电台</span></div></div>
+    </div>
+  </div>
+  <nav class="surface tabbar" aria-label="主导航"><div class="on">${I.home}发现</div><div>${I.chat}对话</div><div>${I.me}我的</div></nav>`;
+
+const chat = (labels) => `
+  ${status}
+  <header class="chat-head">${I.back}<span class="av"></span><div class="who"><b>沈砚</b><span>记得 23 件事 · 已存档</span></div></header>
+  <div class="body">
+    <section class="surface recap" aria-label="上次聊到">
+      <p class="label">${labels.recap}</p>
+      <p>你说周五去面试，他答应那天早上叫你起床。</p>
+      <span class="promise">${I.knot}约定 · 周五早上叫醒你</span>
+    </section>
+    <div class="msg char">早。今天周五，面试别迟到——昨晚说好的，我记着呢。</div>
+    <span class="mem">${I.bookmark}想起了：周五面试</span>
+    <div class="msg user">你居然真的记得</div>
+    <div class="msg char">你的事，我都记得。面完了……晚上要不要见一面？</div>
+    <div class="choices"><button class="btn btn-ghost">好，晚上见</button><button class="btn btn-ghost">今天先不了</button></div>
+    <div class="typing" aria-label="正在输入"><i></i><i></i><i></i></div>
+  </div>
+  <div class="surface composer"><input aria-label="输入消息" placeholder="说点什么…"><button class="send" aria-label="发送">${I.send}</button></div>
+  <p class="sys">本月还剩 128 条 · 没生成完不扣</p>`;
+
+const pay = (labels) => `
+  ${status}
+  <header class="pay-head">${I.back}继续和沈砚聊</header>
+  <div class="body">
+    <section class="surface quota">
+      <p class="label">${labels.quota}</p>
+      <p class="num" style="margin-top:10px">128<small>/ 600 条</small></p>
+      <div class="meter"><i></i></div>
+    </section>
+    <section class="surface rules" aria-label="扣费规则">
+      <p class="label">${labels.rules}</p>
+      <ul style="padding:0;display:flex;flex-direction:column;gap:9px">
+        <li>${I.check}一条回复算一条，你发的不算</li>
+        <li>${I.check}没生成完、重复、出错都不扣</li>
+        <li>${I.check}按月付，随时退订，下月不再扣</li>
+        <li>${I.check}本期价格不变，调整提前 30 天告诉你</li>
+      </ul>
+    </section>
+    <div class="plans">
+      <div class="surface plan sel"><b>月卡</b><span class="price">¥18</span><span>600 条 / 月</span></div>
+      <div class="surface plan"><b>加油包</b><span class="price">¥6</span><span>150 条 · 不过期</span></div>
+    </div>
+    <div class="pay-actions"><button class="btn btn-primary">订阅月卡 · ¥18/月</button><button class="btn btn-ghost">先不了</button></div>
+  </div>
+  <p class="fine">退订在「我的 › 订阅」，一步完成</p>`;
+
+const DIRS = [
+  { cls:'t-glass', tag:'方向 1', name:'暮光玻璃', kw:['未来感：玻璃 + 环境光','温暖：杏色到玫瑰的暮光','高级：颗粒质感、留白'],
+    labels:{hello:'周二 · 晚上',recap:'上次聊到 · 昨晚 23:40',quota:'本月剩余',rules:'先说清楚怎么扣'},
+    take:['<b>借鉴</b>：Apple 的玻璃材质与顶部高光（层级靠材质而不是阴影）；Aura 的多层氛围渐变 + 颗粒，让渐变像“光”而不是“色块”。',
+          '<b>和不晚的关系</b>：暮光就是“不晚”——天将黑未黑。记忆用会微微发光的暖金，像被点亮的一句话。',
+          '<b>风险</b>：玻璃叠玻璃会降低可读性；规定最多两层，输入框和付费规则区用更实的表面。']},
+  { cls:'t-porcelain', tag:'方向 2', name:'晨光陶瓷', kw:['未来感：柔光雾面、悬浮卡片','温暖：蜜桃与薰衣草的晨光','高级：墨色主按钮、圆体数字'],
+    labels:{hello:'周二 · 晚上',recap:'上次聊到 · 昨晚 23:40',quota:'本月剩余',rules:'先说清楚怎么扣'},
+    take:['<b>借鉴</b>：Liquid Glass 的浅色版本（雾面白卡片悬浮在柔光上）；opensourceui 暖纸颗粒；OpenDesign 暖调系统的“墨色 + 一个暖色强调”的克制做法。',
+          '<b>和不晚的关系</b>：主按钮用墨色而不是彩色，付费页最可信；记忆用薰衣草紫，跟警告色完全不撞。',
+          '<b>风险</b>：浅色对夜间重度使用者偏亮，深色模式需要单独设计成“夜里的陶瓷”。']},
+  { cls:'t-amber', tag:'方向 3', name:'琥珀终端', kw:['未来感：网格、轨道环、等宽数字','温暖：单一琥珀色光','高级：极度克制、只有一种颜色'],
+    labels:{hello:'TUE · 22:12',recap:'LAST · 昨晚 23:40',quota:'QUOTA · 本月剩余',rules:'RULES · 扣费规则'},
+    take:['<b>借鉴</b>：OpenDesign 的 Futuristic / HUD 系统（细线、角标、等宽标签），把冷蓝换成琥珀，变成“复古未来”。',
+          '<b>和不晚的关系</b>：轨道环把“他一直在”画了出来；记忆计数、存档状态天然适合这种仪表语言。',
+          '<b>风险</b>：恋爱感最弱，偏科幻、偏男性向；更适合作为某些角色的主题皮肤，而不是品牌主视觉。']},
+];
+
+document.getElementById('dirs').innerHTML = DIRS.map(d => `
+  <section class="dir" aria-labelledby="${d.cls}">
+    <div class="dir-head">
+      <div><p class="eyebrow">${d.tag}</p><h2 id="${d.cls}">${d.name}</h2><div class="kw">${d.kw.map(k=>`<span>${k}</span>`).join('')}</div></div>
+      <ul>${d.take.map(t=>`<li>${t}</li>`).join('')}</ul>
+    </div>
+    <div class="phones">
+      <div><div class="phone ${d.cls}"><div class="screen">${discover(d.labels)}</div></div><p class="cap">发现 · 第一次开聊</p></div>
+      <div><div class="phone ${d.cls}"><div class="screen">${chat(d.labels)}</div></div><p class="cap">聊天 · 回顾与记忆</p></div>
+      <div><div class="phone ${d.cls}"><div class="screen">${pay(d.labels)}</div></div><p class="cap">额度 · 付费决策</p></div>
+    </div>
+  </section>`).join('');
+
+// 对比度：用每个方向的近似实底（--chk-bg）计算
+function rgb(s){const c=document.createElement('canvas').getContext('2d');c.fillStyle=s;c.fillRect(0,0,1,1);return [...c.getImageData(0,0,1,1).data]}
+function lum([r,g,b]){return [r,g,b].map(v=>{v/=255;return v<=.03928?v/12.92:((v+.055)/1.055)**2.4}).reduce((a,v,i)=>a+v*[.2126,.7152,.0722][i],0)}
+function blend(fg,bg){const a=fg[3]/255;return [0,1,2].map(i=>Math.round(fg[i]*a+bg[i]*(1-a))).concat(255)}
+function ratio(a,b){const x=lum(a),y=lum(b);return (Math.max(x,y)+.05)/(Math.min(x,y)+.05)}
+const rows=[];
+DIRS.forEach(d=>{
+  const el=document.querySelector('.'+d.cls), cs=getComputedStyle(el), v=n=>cs.getPropertyValue(n).trim();
+  const base=rgb(v('--chk-bg'));
+  const on=(fg,bg)=>{const b=bg?blend(rgb(bg),base):base;return ratio(blend(rgb(fg),b),b)};
+  const accentSolid = d.cls==='t-glass' ? '#F57E98' : v('--accent-fill');
+  [['正文 / 底','--text',null],['次要文字 / 底','--text-2',null],['提示文字 / 底','--text-3',null],['记忆文字 / 记忆底','--mem','--mem-bg'],['用户气泡文字','--user-text','--user-bg']]
+    .forEach(([k,f,b])=>rows.push([d.name,k,on(v(f),b?v(b):null)]));
+  rows.push([d.name,'主按钮文字（取渐变较深端）',ratio(rgb(v('--on-accent')),rgb(accentSolid))]);
+});
+document.querySelector('#contrast tbody').innerHTML=rows.map(([a,b,r])=>`<tr><td>${a}</td><td>${b}</td><td class="n">${r.toFixed(2)}:1</td><td class="${r>=4.5?'ok':'bad'}">${r>=4.5?'通过':'不足'}</td></tr>`).join('');
+</script>
+</body>
+</html>

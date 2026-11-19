@@ -1,0 +1,11 @@
+ALTER TABLE memories ADD COLUMN topic_key TEXT NOT NULL DEFAULT '';
+ALTER TABLE memories ADD COLUMN index_status TEXT NOT NULL DEFAULT 'pending' CHECK(index_status IN ('pending','ready','failed','unconfigured'));
+ALTER TABLE memories ADD COLUMN conflict_id TEXT;
+ALTER TABLE memories ADD COLUMN expires_note TEXT;
+CREATE TABLE memory_state(conversation_id TEXT PRIMARY KEY REFERENCES conversations(id), revision INTEGER NOT NULL DEFAULT 0);
+CREATE TABLE memory_jobs(id TEXT PRIMARY KEY,conversation_id TEXT NOT NULL REFERENCES conversations(id),reply_id TEXT NOT NULL REFERENCES messages(id),base_revision INTEGER NOT NULL,status TEXT NOT NULL,error_code TEXT,created_at INTEGER NOT NULL,updated_at INTEGER NOT NULL,UNIQUE(conversation_id,reply_id));
+CREATE TABLE memory_vectors(memory_id TEXT PRIMARY KEY REFERENCES memories(id),revision INTEGER NOT NULL,model TEXT NOT NULL,dimensions INTEGER NOT NULL,vector TEXT NOT NULL);
+CREATE TABLE memory_context_blocks(conversation_id TEXT NOT NULL REFERENCES conversations(id),message_id TEXT NOT NULL REFERENCES messages(id),reason TEXT NOT NULL,PRIMARY KEY(conversation_id,message_id));
+CREATE TABLE memory_call_audit(id TEXT PRIMARY KEY,conversation_id TEXT NOT NULL REFERENCES conversations(id),purpose TEXT NOT NULL,mode TEXT NOT NULL,model TEXT NOT NULL,status TEXT NOT NULL,input_tokens INTEGER,output_tokens INTEGER,error_code TEXT,created_at INTEGER NOT NULL);
+CREATE TABLE memory_retrievals(generation_id TEXT PRIMARY KEY REFERENCES generation_requests(id),conversation_id TEXT NOT NULL REFERENCES conversations(id),memory_revision INTEGER NOT NULL,selected TEXT NOT NULL,mode TEXT NOT NULL,created_at INTEGER NOT NULL);
+CREATE TABLE memory_evidence(memory_id TEXT NOT NULL REFERENCES memories(id),message_id TEXT NOT NULL REFERENCES messages(id),quote TEXT NOT NULL,PRIMARY KEY(memory_id,message_id));

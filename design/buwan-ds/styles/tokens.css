@@ -1,0 +1,300 @@
+/* =====================================================================
+   不晚 Design Tokens · 暮光玻璃 (Dusk Glass) · v1.0
+   单一事实源：所有颜色、字号、间距、圆角、阴影、动效只允许在本文件定义。
+   检索约定：
+     @principle P0–P6   对应品牌原则（见 foundations.html#principles）
+     @scene     S1–S5   对应核心场景
+   命名：--bw-{类别}-{角色}-{变体}
+   主题：:root = 深色（品牌默认）；[data-theme="light"] = 浅色“暮光·浅”
+   ===================================================================== */
+
+:root {
+  /* ---------- 0. 原始色板 Primitive（只给语义 Token 引用，组件禁止直接使用） ---------- */
+  /* 杏 apricot：暮光的暖端 */
+  --bw-apricot-200: #FFD8BF;
+  --bw-apricot-300: #FFC39B;
+  --bw-apricot-400: #FFA877;
+  /* 玫 rose：关系 / 品牌 */
+  --bw-rose-300: #F7A0B3;
+  --bw-rose-400: #F57E98;
+  --bw-rose-600: #B83A5E;
+  --bw-rose-700: #8E2747;
+  /* 梅 plum：暮光的深端 */
+  --bw-plum-500: #782C78;
+  --bw-plum-700: #4A1A3C;
+  --bw-plum-900: #2A0F22;
+  /* 烛金 ember：记忆专用 @principle P3 */
+  --bw-ember-200: #FFE3BD;
+  --bw-ember-300: #FFD9A8;
+  --bw-ember-700: #7A4D0F;
+  /* 夜 night：深色中性 */
+  --bw-night-950: #0E080B;
+  --bw-night-900: #140C10;
+  --bw-night-800: #20121A;
+  /* 霞 dawn：浅色中性 */
+  --bw-dawn-50: #FFF9F5;
+  --bw-dawn-100: #FBF1EA;
+  --bw-ink-900: #2A151D;
+  --bw-ink-600: #6E5560;
+  --bw-ink-500: #7A626C;
+
+  /* ---------- 1. 语义色 Color（深色） ---------- */
+  --bw-color-bg: var(--bw-night-900);
+  --bw-color-bg-deep: var(--bw-night-950);
+  --bw-color-text: #FCF2EC;                         /* 15.5:1 */
+  --bw-color-text-2: rgba(252, 242, 236, 0.72);     /* 8.6:1  次要信息 */
+  --bw-color-text-3: rgba(252, 242, 236, 0.54);     /* ≥4.8:1 提示、系统声部 @principle P0 */
+  --bw-color-line: rgba(255, 255, 255, 0.12);
+  --bw-color-line-strong: rgba(255, 255, 255, 0.24);
+  --bw-color-silhouette: rgba(30, 8, 20, 0.55);
+
+  /* 品牌 / 关系 @principle P1 P4 */
+  --bw-color-accent: var(--bw-rose-300);            /* 链接、强调文字 */
+  --bw-color-accent-soft: rgba(245, 126, 152, 0.16);
+  --bw-color-accent-border: rgba(255, 195, 155, 0.6);
+  --bw-gradient-accent: linear-gradient(135deg, var(--bw-apricot-300), var(--bw-rose-400));
+  --bw-color-on-accent: #2B0F18;                    /* 渐变深端上 7.0:1 */
+
+  /* 记忆 @principle P3 @scene S3 S4 —— 只给记忆、约定、回顾使用 */
+  --bw-color-memory: var(--bw-ember-300);
+  --bw-color-memory-soft: rgba(255, 200, 140, 0.12);
+  --bw-color-memory-soft-strong: rgba(255, 200, 140, 0.2);
+  --bw-color-memory-border: rgba(255, 210, 160, 0.32);
+  --bw-gradient-memory: linear-gradient(180deg, var(--bw-ember-300), rgba(255, 217, 168, 0));
+
+  /* 用户声部：墨在你手里 @principle P4 */
+  --bw-color-user-bubble: #FCEDE6;
+  --bw-color-user-text: #2B1219;
+
+  /* 语义状态（全部配图标+文字，绝不只靠颜色） */
+  --bw-color-success: #8FD3A8;
+  --bw-color-success-soft: rgba(143, 211, 168, 0.14);
+  --bw-color-warning: #FF9F6E;                      /* 偏橙红，与记忆烛金拉开色相 */
+  --bw-color-warning-soft: rgba(255, 159, 110, 0.14);
+  --bw-color-danger: #FF8A80;
+  --bw-color-danger-soft: rgba(255, 138, 128, 0.14);
+  --bw-color-info: #C9B8F5;
+  --bw-color-info-soft: rgba(201, 184, 245, 0.14);
+  --bw-color-focus: #FFD2B5;
+
+  /* ---------- 2. 材质 Material：玻璃 @principle P0 ---------- */
+  --bw-glass-1: rgba(255, 236, 228, 0.08);          /* 卡片、气泡 */
+  --bw-glass-2: rgba(255, 236, 228, 0.12);          /* 按钮、强调面 */
+  --bw-glass-hover: rgba(255, 236, 228, 0.18);
+  --bw-glass-solid: rgba(32, 18, 26, 0.88);         /* 输入、规则、弹窗：保证可读 @principle P6 */
+  --bw-glass-border: rgba(255, 255, 255, 0.14);
+  --bw-glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  --bw-blur-1: blur(16px) saturate(1.3);
+  --bw-blur-2: blur(28px) saturate(1.5);
+  --bw-scrim: rgba(10, 4, 8, 0.62);
+  --bw-fade-bottom: linear-gradient(180deg, rgba(20, 12, 16, 0), rgba(20, 12, 16, 0.96) 30%);   /* 吸底区域渐隐，防止内容透出 @principle P0 */
+
+  /* 暮光环境光 + 颗粒 */
+  --bw-aurora:
+    radial-gradient(120% 60% at 0% 0%, rgba(255, 150, 96, 0.40), transparent 60%),
+    radial-gradient(90% 55% at 100% 18%, rgba(232, 86, 128, 0.34), transparent 62%),
+    radial-gradient(120% 60% at 50% 100%, rgba(120, 44, 120, 0.42), transparent 65%);
+  --bw-texture-grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url%28%23n%29'/></svg>");
+  --bw-grain-opacity: 0.14;
+  --bw-glow-orb: radial-gradient(circle at 35% 30%, var(--bw-apricot-300), var(--bw-rose-400) 45%, var(--bw-plum-700) 100%);
+
+  /* 压在图片 / 纯黑上的界面：不随主题变化（浅色模式里同样保持深底浅字） @principle P0 @scene S1 */
+  --bw-color-black: #000000;                        /* 底部标签栏、沉浸页底色 */
+  --bw-color-on-image: #FCF2EC;
+  --bw-color-on-image-2: rgba(252, 242, 236, 0.78);
+  --bw-color-on-image-3: rgba(252, 242, 236, 0.64);
+  --bw-color-on-image-line: rgba(255, 255, 255, 0.12);
+  --bw-glass-on-image: rgba(40, 26, 32, 0.26);      /* 毛玻璃开场面板 */
+  --bw-glass-on-image-border: rgba(255, 255, 255, 0.16);
+  --bw-glass-on-image-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  --bw-glass-on-image-chip: rgba(255, 255, 255, 0.12);
+  --bw-input-on-image: rgba(0, 0, 0, 0.3);
+  /* 全屏人物蒙层：顶部轻压（字标可读）+ 底部黑色渐变（操作区可读） */
+  --bw-scrim-spotlight: linear-gradient(180deg, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0) 14%, rgba(0, 0, 0, 0) 36%, rgba(0, 0, 0, 0.5) 58%, rgba(0, 0, 0, 0.78) 100%);
+  --bw-blur-backdrop: blur(48px) saturate(1.2) brightness(0.45);   /* 宽屏两侧的同图模糊背景 */
+  --bw-backdrop-scale: 1.12;
+  --bw-avatar-zoom: 2.2;                              /* 真实头像：从全身立绘里放大取脸 @principle P1 */
+  /* 首页原地对话：图上的气泡、对话区高度、顶部淡出遮罩 @principle P0 P5 @scene S1 S2 */
+  --bw-color-on-image-ink: #2B1219;                 /* 图上用户气泡（浅底）上的文字 */
+  --bw-thread-immersive-h: 40dvh;                   /* 对话区固定高度，人物的脸始终露在上方 */
+  --bw-mask-fade-top: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 42%);   /* 越往上越透明 */
+  --bw-scrim-spotlight-chat: linear-gradient(180deg, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0) 14%, rgba(0, 0, 0, 0.12) 30%, rgba(0, 0, 0, 0.66) 52%, rgba(0, 0, 0, 0.9) 100%);
+
+  /* 角色立绘底（创作者扩展时可新增 --bw-portrait-n） @scene S1 */
+  --bw-portrait-1: radial-gradient(70% 80% at 50% 30%, var(--bw-apricot-400) 0%, #D4577A 45%, var(--bw-plum-700) 100%);
+  --bw-portrait-2: radial-gradient(70% 80% at 50% 30%, var(--bw-apricot-200) 0%, #C9809C 45%, #3E2048 100%);
+  --bw-portrait-3: radial-gradient(70% 80% at 50% 30%, #F2C9A0 0%, #9C5A8A 50%, #24142E 100%);
+
+  /* ---------- 3. 阴影与发光 Elevation ---------- */
+  --bw-shadow-1: 0 4px 16px rgba(10, 0, 6, 0.25);
+  --bw-shadow-2: 0 12px 32px rgba(10, 0, 6, 0.38);
+  --bw-shadow-3: 0 24px 64px rgba(10, 0, 6, 0.55);
+  --bw-glow-accent: 0 8px 24px rgba(245, 126, 152, 0.32);
+  --bw-glow-accent-strong: 0 10px 32px rgba(245, 126, 152, 0.48);
+  --bw-glow-memory: 0 0 18px rgba(255, 190, 120, 0.26);
+
+  /* ---------- 4. 字体 Typography（只用 iOS 系统字体） ---------- */
+  --bw-font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Helvetica Neue", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  --bw-font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", "Helvetica Neue", sans-serif;
+  --bw-font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --bw-text-2xs: 11px;   /* 仅限标签栏文字、角标 */
+  --bw-text-xs: 12px;
+  --bw-text-sm: 13px;
+  --bw-text-md: 15px;    /* 界面默认 */
+  --bw-text-base: 16px;  /* 聊天正文、输入框（防 iOS 缩放） @scene S2 */
+  --bw-text-lg: 18px;
+  --bw-text-xl: 22px;
+  --bw-text-2xl: 28px;
+  --bw-text-3xl: 34px;
+  --bw-text-4xl: 44px;   /* 规范站页面大标题（≥1024） */
+  --bw-text-hero: 54px;  /* 额度大数字 @scene S5 */
+  --bw-leading-tight: 1.2;
+  --bw-leading-snug: 1.4;
+  --bw-leading-body: 1.6;
+  --bw-weight-regular: 400;
+  --bw-weight-medium: 500;
+  --bw-weight-semibold: 600;
+  --bw-tracking-display: -0.02em;
+  --bw-tracking-label: 0.04em;
+  --bw-tracking-wordmark: 0.08em;
+
+  /* ---------- 5. 空间 Space（4 基数） ---------- */
+  --bw-space-0_5: 2px;
+  --bw-space-1: 4px;
+  --bw-space-2: 8px;
+  --bw-space-3: 12px;
+  --bw-space-4: 16px;
+  --bw-space-5: 20px;
+  --bw-space-6: 24px;
+  --bw-space-8: 32px;
+  --bw-space-10: 40px;
+  --bw-space-12: 48px;
+  --bw-space-16: 64px;
+  --bw-space-20: 80px;
+
+  /* ---------- 6. 形状 Shape ---------- */
+  --bw-radius-xs: 6px;    /* 气泡锚角：指向说话人 */
+  --bw-radius-sm: 10px;
+  --bw-radius-md: 16px;
+  --bw-radius-lg: 22px;   /* 气泡、小卡片 */
+  --bw-radius-xl: 28px;   /* 卡片、弹窗 */
+  --bw-radius-pill: 999px;
+  --bw-border-1: 1px;
+  --bw-border-2: 2px;
+
+  /* ---------- 7. 尺寸 Size ---------- */
+  --bw-size-tap: 44px;          /* 最小点击区 @a11y */
+  --bw-size-control-sm: 36px;
+  --bw-size-control-md: 44px;
+  --bw-size-control-lg: 52px;
+  --bw-size-icon-sm: 16px;
+  --bw-size-icon-md: 20px;
+  --bw-size-icon-lg: 24px;
+  --bw-icon-stroke: 1.6;
+  --bw-size-avatar-sm: 32px;
+  --bw-size-avatar-md: 40px;
+  --bw-size-avatar-lg: 56px;
+  --bw-size-portrait: 240px;
+  --bw-size-meter: 6px;
+  --bw-size-dot: 6px;
+  --bw-size-node: 10px;
+  --bw-size-caret: 2px;
+  --bw-size-orb: 96px;
+  --bw-measure: 640px;          /* 正文最大行长 */
+  --bw-measure-narrow: 320px;
+
+  /* ---------- 8. 布局 Layout ---------- */
+  --bw-app-max: 480px;          /* 移动端内容列 */
+  --bw-panel-w: 360px;          /* ≥1024 侧栏（记忆面板） */
+  --bw-modal-w: 440px;
+  --bw-sidebar-w: 264px;        /* 规范站侧边导航 */
+  --bw-content-max: 1040px;
+  --bw-docs-max: 1160px;        /* 规范站正文最大宽度 */
+  --bw-header-h: 56px;
+  --bw-device-w: 390px;
+  --bw-device-h: 800px;
+  --bw-size-palette: 208px;   /* 规范站色带高度 */
+
+  /* ---------- 9. 动效 Motion @principle P2：慢一拍、匀速、不回弹 ---------- */
+  --bw-dur-fast: 120ms;
+  --bw-dur-base: 200ms;
+  --bw-dur-slow: 320ms;
+  --bw-dur-spin: 800ms;
+  --bw-dur-breath: 1600ms;
+  --bw-ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --bw-ease-inout: cubic-bezier(0.4, 0, 0.2, 1);
+  --bw-press-scale: 0.98;
+  --bw-lift: -2px;
+
+  /* ---------- 10. 其他 ---------- */
+  --bw-opacity-disabled: 0.42;
+  --bw-opacity-meta: 0.72;    /* 色块里的 Token 名与色值 */
+  --bw-focus-offset: 3px;
+  --bw-z-header: 10;
+  --bw-z-nav: 20;
+  --bw-z-scrim: 40;
+  --bw-z-modal: 50;
+  --bw-z-toast: 60;
+  color-scheme: dark;
+}
+
+/* ===================== 浅色 · 暮光·浅 ===================== */
+[data-theme="light"] {
+  --bw-color-bg: var(--bw-dawn-100);
+  --bw-color-bg-deep: var(--bw-dawn-50);
+  --bw-color-text: var(--bw-ink-900);
+  --bw-color-text-2: var(--bw-ink-600);
+  --bw-color-text-3: var(--bw-ink-500);
+  --bw-color-line: rgba(42, 21, 29, 0.10);
+  --bw-color-line-strong: rgba(42, 21, 29, 0.20);
+  --bw-color-silhouette: rgba(255, 255, 255, 0.5);
+
+  --bw-color-accent: var(--bw-rose-600);
+  --bw-color-accent-soft: rgba(184, 58, 94, 0.10);
+  --bw-color-accent-border: rgba(184, 58, 94, 0.45);
+
+  --bw-color-memory: var(--bw-ember-700);
+  --bw-color-memory-soft: rgba(230, 170, 80, 0.16);
+  --bw-color-memory-soft-strong: rgba(230, 170, 80, 0.26);
+  --bw-color-memory-border: rgba(180, 120, 40, 0.28);
+  --bw-gradient-memory: linear-gradient(180deg, #D9A441, rgba(217, 164, 65, 0));
+
+  --bw-color-user-bubble: var(--bw-ink-900);
+  --bw-color-user-text: #FFF4EE;
+
+  --bw-color-success: #256847;
+  --bw-color-success-soft: rgba(47, 122, 85, 0.10);
+  --bw-color-warning: #973B14;
+  --bw-color-warning-soft: rgba(176, 70, 26, 0.10);
+  --bw-color-danger: #B42318;
+  --bw-color-danger-soft: rgba(180, 35, 24, 0.08);
+  --bw-color-info: #6B4FA0;
+  --bw-color-info-soft: rgba(107, 79, 160, 0.10);
+  --bw-color-focus: var(--bw-rose-600);
+
+  --bw-glass-1: rgba(255, 255, 255, 0.55);
+  --bw-glass-2: rgba(255, 255, 255, 0.72);
+  --bw-glass-hover: rgba(255, 255, 255, 0.9);
+  --bw-glass-solid: rgba(255, 250, 246, 0.94);
+  --bw-glass-border: rgba(255, 255, 255, 0.85);
+  --bw-glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  --bw-scrim: rgba(42, 21, 29, 0.32);
+  --bw-fade-bottom: linear-gradient(180deg, rgba(251, 241, 234, 0), rgba(251, 241, 234, 0.97) 30%);
+
+  --bw-aurora:
+    radial-gradient(110% 55% at 0% 0%, rgba(255, 186, 146, 0.60), transparent 62%),
+    radial-gradient(90% 50% at 100% 14%, rgba(245, 150, 178, 0.38), transparent 62%),
+    radial-gradient(120% 60% at 50% 100%, rgba(206, 176, 232, 0.42), transparent 66%);
+  --bw-grain-opacity: 0.06;
+  --bw-portrait-1: linear-gradient(160deg, var(--bw-apricot-200) 0%, #F2A88A 45%, #C88AAE 100%);
+  --bw-portrait-2: linear-gradient(160deg, #FFE6D3 0%, #EFB3C3 50%, #B9A0DD 100%);
+  --bw-portrait-3: linear-gradient(160deg, #F6DCC0 0%, #D59FB8 50%, #8E7BB8 100%);
+
+  --bw-shadow-1: 0 2px 10px rgba(120, 60, 50, 0.08);
+  --bw-shadow-2: 0 14px 36px rgba(120, 60, 50, 0.12);
+  --bw-shadow-3: 0 28px 64px rgba(90, 40, 40, 0.20);
+  --bw-glow-accent: 0 8px 22px rgba(240, 122, 149, 0.30);
+  --bw-glow-accent-strong: 0 10px 28px rgba(240, 122, 149, 0.42);
+  --bw-glow-memory: 0 0 14px rgba(240, 180, 90, 0.22);
+  color-scheme: light;
+}

@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="bw-icons" content="assets/icons.svg">
+<title>不晚 设计系统 · 总览</title>
+<link rel="stylesheet" href="styles/tokens.css">
+<link rel="stylesheet" href="styles/layout.css">
+<link rel="stylesheet" href="styles/components.css">
+<link rel="stylesheet" href="styles/docs.css">
+<script>try{if(localStorage.getItem('bw-theme')==='light')document.documentElement.setAttribute('data-theme','light')}catch(e){}</script>
+<script src="scripts/main.js" defer></script>
+</head>
+<body class="bw-canvas">
+<a class="bw-skip" href="#main">跳到正文</a>
+<div class="bw-docs">
+  <nav class="bw-docs__sidebar" data-bw-sidebar aria-label="规范导航">
+    <div class="bw-docs__sidebar-head">
+      <a class="bw-docs__brand" href="index.html"><span class="bw-docs__brand-mark" aria-hidden="true"></span><span class="bw-wordmark">不晚</span><span class="bw-fine">Design System</span></a>
+      <button class="bw-icon-btn bw-icon-btn--sm" type="button" data-bw-theme-toggle aria-pressed="false" aria-label="切换到浅色"><svg class="bw-icon bw-icon--sm" aria-hidden="true"><use href="assets/icons.svg#sun"/></svg></button>
+    </div>
+    <div class="bw-sidenav">
+      <div class="bw-sidenav__group">
+        <a class="bw-sidenav__link bw-sidenav__link--page" href="index.html" aria-current="page">总览</a>
+        <div class="bw-sidenav__sub">
+          <a class="bw-sidenav__link bw-sidenav__link--sub" href="#overview">产品与用户</a>
+          <a class="bw-sidenav__link bw-sidenav__link--sub" href="#principles">品牌原则 P0–P6</a>
+          <a class="bw-sidenav__link bw-sidenav__link--sub" href="#keywords">关键词与反关键词</a>
+          <a class="bw-sidenav__link bw-sidenav__link--sub" href="#pages">核心页面</a>
+        </div>
+        <a class="bw-sidenav__link bw-sidenav__link--page" href="foundations.html">基础</a>
+        <a class="bw-sidenav__link bw-sidenav__link--page" href="components.html">组件</a>
+        <a class="bw-sidenav__link bw-sidenav__link--page" href="audit.html">自检</a>
+      </div>
+      <div class="bw-sidenav__group">
+        <p class="bw-label bw-sidenav__heading">核心页面</p>
+        <a class="bw-sidenav__link" href="pages/discover.html">S1 发现与开聊</a>
+        <a class="bw-sidenav__link" href="pages/chat.html">S2 日常聊天</a>
+        <a class="bw-sidenav__link" href="pages/return.html">S3 隔天回归</a>
+        <a class="bw-sidenav__link" href="pages/control.html">S4 分支与纠正</a>
+        <a class="bw-sidenav__link" href="pages/payment.html">S5 额度与付费</a>
+      </div>
+    </div>
+  </nav>
+  <div class="bw-docs__scrim" data-bw-scrim></div>
+
+  <div class="bw-docs__main">
+    <header class="bw-docs__bar">
+      <button class="bw-icon-btn bw-docs__menu" type="button" data-bw-nav-toggle aria-expanded="false" aria-label="打开导航"><svg class="bw-icon" aria-hidden="true"><use href="assets/icons.svg#menu"/></svg></button>
+      <span class="bw-caption">总览</span>
+      <div class="bw-docs__bar-end">
+        <button class="bw-icon-btn" type="button" data-bw-theme-toggle aria-pressed="false" aria-label="切换到浅色"><svg class="bw-icon" aria-hidden="true"><use href="assets/icons.svg#sun"/></svg></button>
+      </div>
+    </header>
+
+    <main id="main" class="bw-docs__content">
+      <section class="bw-hero" aria-labelledby="t-hero">
+        <p class="bw-hero__eyebrow">不晚 DESIGN SYSTEM · 暮光玻璃 · v1.0</p>
+        <h1 id="t-hero" class="bw-hero__title">是同一个人，记得对，接得上，由你决定。</h1>
+        <p class="bw-hero__lede">这份规范是不晚所有界面的单一事实源。颜色、字号、间距、圆角、阴影、动效只在 Token 里定义；组件只引用 Token；页面只使用登记过的组件和布局模板。规范站本身也完全由这套系统搭建。</p>
+        <div class="bw-cluster bw-cluster--3">
+          <a class="bw-btn bw-btn--primary" href="foundations.html">从基础开始</a>
+          <a class="bw-btn bw-btn--secondary" href="#pages">看核心页面</a>
+          <a class="bw-btn bw-btn--ghost" href="audit.html">一致性自检</a>
+        </div>
+      </section>
+
+      <section id="overview" class="bw-section" aria-labelledby="t-overview">
+        <div class="bw-section__head">
+          <p class="bw-section__id">#overview</p>
+          <h2 id="t-overview" class="bw-title">产品与用户</h2>
+          <p class="bw-caption bw-prose">不晚是一款 AI 角色陪伴产品。设计主线优先服务恋爱向重度玩家，同时不排斥慢热的日常陪伴用户；角色创作者暂缓，只在规范里预留扩展位。</p>
+        </div>
+        <div class="bw-grid bw-grid--3">
+          <article class="bw-card bw-stack bw-stack--3">
+            <span class="bw-tag bw-tag--accent">A · 核心</span>
+            <h3 class="bw-subheading">恋爱向重度玩家</h3>
+            <p class="bw-caption">成年女性，学生或年轻白领。把角色当“可互动的小说”，长期绑定一个角色，重剧情、重分支；碎片时间高频使用，小额月付。</p>
+          </article>
+          <article class="bw-card bw-stack bw-stack--3">
+            <span class="bw-tag">B · 次要</span>
+            <h3 class="bw-subheading">慢热日常陪伴</h3>
+            <p class="bw-caption">要的是“记得我、每天聊几句”。追求平淡的幸福感，有情绪需要时打开。</p>
+          </article>
+          <article class="bw-card bw-stack bw-stack--3">
+            <span class="bw-tag">C · 暂缓</span>
+            <h3 class="bw-subheading">角色创作者</h3>
+            <p class="bw-caption">本期不设计。预留：角色卡作者区、<code class="bw-code-inline">--bw-portrait-n</code> 立绘扩展。</p>
+          </article>
+        </div>
+        <div class="bw-table-wrap">
+          <table class="bw-table">
+            <caption>五个核心场景</caption>
+            <thead><tr><th scope="col">编号</th><th scope="col">场景</th><th scope="col">最怕什么</th><th scope="col">体验要求</th><th scope="col">页面</th></tr></thead>
+            <tbody>
+              <tr><td><span class="bw-tag">S1</span></td><td>发现角色、第一次开聊</td><td>挑剔没耐心、找卡难、首聊像 AI</td><td>低进入成本、强角色吸引力、首聊有活人感</td><td><a href="pages/discover.html">discover</a></td></tr>
+              <tr><td><span class="bw-tag">S2</span></td><td>碎片时间日常聊天</td><td>截断重复、人设不稳、抢话、插广告、卡顿</td><td>稳定、连贯、无干扰、反馈及时</td><td><a href="pages/chat.html">chat</a></td></tr>
+              <tr><td><span class="bw-tag">S3</span></td><td>隔天回来接着聊</td><td>忘了前文、存档丢、下架、换模型像换人</td><td>记忆与连续性是一等公民</td><td><a href="pages/return.html">return</a></td></tr>
+              <tr><td><span class="bw-tag">S4</span></td><td>决定关系与剧情走向</td><td>AI 替你答应、用新会话代替分支、记错改不了</td><td>用户主权显性化</td><td><a href="pages/control.html">control</a></td></tr>
+              <tr><td><span class="bw-tag">S5</span></td><td>额度用完决定付费</td><td>规则看不懂、失败照扣、怕跑路涨价</td><td>透明、可预期、低风险感</td><td><a href="pages/payment.html">payment</a></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="principles" class="bw-section" aria-labelledby="t-principles">
+        <div class="bw-section__head">
+          <p class="bw-section__id">#principles</p>
+          <h2 id="t-principles" class="bw-title">品牌原则 P0–P6</h2>
+          <p class="bw-caption bw-prose">每条原则都能从场景追溯到 Token。编号是检索锚点：在代码里搜 <code class="bw-code-inline">P3</code> 能找到所有服务“记得对”的 Token、组件和页面（<code class="bw-code-inline">@principle</code> 注释与 <code class="bw-code-inline">data-principle</code> 属性）。完整推导表见 <a href="foundations.html#derivation">基础 · 推导表</a>。</p>
+        </div>
+
+        <div class="bw-stack bw-stack--6">
+          <article id="p0" class="bw-card bw-stack" data-principle="P0">
+            <div class="bw-cluster"><span class="bw-tag bw-tag--accent">P0 · immersion</span><h3 class="bw-subheading">角色在前，界面让位</h3></div>
+            <div class="bw-trace">
+              <div class="bw-trace__step"><span class="bw-label">洞察</span>挑剔没耐心；最烦沉浸被打断、聊天里插广告（S1 S2）</div>
+              <div class="bw-trace__step"><span class="bw-label">承诺</span>3 秒判断合不合拍；聊天区没有任何商业内容</div>
+              <div class="bw-trace__step"><span class="bw-label">原则</span>立绘和台词是主角，界面是玻璃，看得见但不抢</div>
+              <div class="bw-trace__step"><span class="bw-label">决策</span>暮光环境光 + 半透明玻璃；聊天流禁止推广组件</div>
+              <div class="bw-trace__step"><span class="bw-label">Token / 组件</span><code class="bw-code-inline">--bw-glass-*</code> <code class="bw-code-inline">--bw-aurora</code> Spotlight Starter</div>
+            </div>
+          </article>
+          <article id="p1" class="bw-card bw-stack" data-principle="P1">
+            <div class="bw-cluster"><span class="bw-tag bw-tag--accent">P1 · same-person</span><h3 class="bw-subheading">同一个人：人设恒定</h3></div>
+            <div class="bw-trace">
+              <div class="bw-trace__step"><span class="bw-label">洞察</span>首聊太像 AI；换模型像换人（S1 S3）</div>
+              <div class="bw-trace__step"><span class="bw-label">承诺</span>第一句就像这个人；换了引擎还是这个人</div>
+              <div class="bw-trace__step"><span class="bw-label">原则</span>角色的视觉身份永远不变，变化必须被说明</div>
+              <div class="bw-trace__step"><span class="bw-label">决策</span>开场预览角色原话；模型更新给出人设锚点清单</div>
+              <div class="bw-trace__step"><span class="bw-label">Token / 组件</span><code class="bw-code-inline">--bw-portrait-n</code> OpeningPanel Checklist</div>
+            </div>
+          </article>
+          <article id="p2" class="bw-card bw-stack" data-principle="P2">
+            <div class="bw-cluster"><span class="bw-tag bw-tag--accent">P2 · steady</span><h3 class="bw-subheading">稳：反馈及时，节奏匀速</h3></div>
+            <div class="bw-trace">
+              <div class="bw-trace__step"><span class="bw-label">洞察</span>回复截断、重复、生成慢卡顿（S2）</div>
+              <div class="bw-trace__step"><span class="bw-label">承诺</span>有回应就显示；出错说清楚并且不扣</div>
+              <div class="bw-trace__step"><span class="bw-label">原则</span>动效慢一拍、不回弹；不伪造延迟</div>
+              <div class="bw-trace__step"><span class="bw-label">决策</span>呼吸式输入指示、流式光标、气泡内续写/重写</div>
+              <div class="bw-trace__step"><span class="bw-label">Token / 组件</span><code class="bw-code-inline">--bw-dur-*</code> <code class="bw-code-inline">--bw-ease-out</code> Typing Retry</div>
+            </div>
+          </article>
+          <article id="p3" class="bw-card bw-stack" data-principle="P3">
+            <div class="bw-cluster"><span class="bw-tag bw-tag--memory">P3 · remember-right</span><h3 class="bw-subheading">记得对：记忆可见、可改</h3></div>
+            <div class="bw-trace">
+              <div class="bw-trace__step"><span class="bw-label">洞察</span>最高频痛点：忘了前文和重要剧情；记错改不了（S3 S4）</div>
+              <div class="bw-trace__step"><span class="bw-label">承诺</span>它记得什么，你看得见；改了马上生效</div>
+              <div class="bw-trace__step"><span class="bw-label">原则</span>记忆有专属的烛金色，只给记忆用</div>
+              <div class="bw-trace__step"><span class="bw-label">决策</span>“想起了”标签、记忆列表、原来 → 改为 的纠正面板</div>
+              <div class="bw-trace__step"><span class="bw-label">Token / 组件</span><code class="bw-code-inline">--bw-color-memory-*</code> MemoryChip Correction</div>
+            </div>
+          </article>
+          <article id="p4" class="bw-card bw-stack" data-principle="P4">
+            <div class="bw-cluster"><span class="bw-tag bw-tag--accent">P4 · you-decide</span><h3 class="bw-subheading">由你决定：选择等权，不代答</h3></div>
+            <div class="bw-trace">
+              <div class="bw-trace__step"><span class="bw-label">洞察</span>AI 替用户答应、推进；用新会话代替分支（S2 S4）</div>
+              <div class="bw-trace__step"><span class="bw-label">承诺</span>你的话只由你说；在这里分岔，原线还在</div>
+              <div class="bw-trace__step"><span class="bw-label">原则</span>接受和拒绝同样好点；用户声部视觉独占</div>
+              <div class="bw-trace__step"><span class="bw-label">决策</span>等宽选择组；用户气泡实底；任意消息可分岔</div>
+              <div class="bw-trace__step"><span class="bw-label">Token / 组件</span><code class="bw-code-inline">--bw-color-user-*</code> ChoiceGroup Branch Stage</div>
+            </div>
+          </article>
+          <article id="p5" class="bw-card bw-stack" data-principle="P5">
+            <div class="bw-cluster"><span class="bw-tag bw-tag--memory">P5 · continue</span><h3 class="bw-subheading">接得上：从上次那一页开始</h3></div>
+            <div class="bw-trace">
+              <div class="bw-trace__step"><span class="bw-label">洞察</span>隔天回来关系断了；存档丢、角色下架（S3）</div>
+              <div class="bw-trace__step"><span class="bw-label">承诺</span>回来第一眼就知道聊到哪；存档一直在</div>
+              <div class="bw-trace__step"><span class="bw-label">原则</span>“一根线”贯穿共同经历</div>
+              <div class="bw-trace__step"><span class="bw-label">决策</span>回顾卡、未完成约定、时间线、存档状态常驻</div>
+              <div class="bw-trace__step"><span class="bw-label">Token / 组件</span><code class="bw-code-inline">--bw-gradient-memory</code> Recap Timeline Continuity</div>
+            </div>
+          </article>
+          <article id="p6" class="bw-card bw-stack" data-principle="P6">
+            <div class="bw-cluster"><span class="bw-tag bw-tag--accent">P6 · rules-first</span><h3 class="bw-subheading">规则先行：先讲怎么扣，再讲多少钱</h3></div>
+            <div class="bw-trace">
+              <div class="bw-trace__step"><span class="bw-label">洞察</span>规则看不懂、失败照扣、怕跑路涨价（S5）</div>
+              <div class="bw-trace__step"><span class="bw-label">承诺</span>一句话讲清怎么扣；每一笔都能查</div>
+              <div class="bw-trace__step"><span class="bw-label">原则</span>付费只用系统声部，绝不借角色口吻催付</div>
+              <div class="bw-trace__step"><span class="bw-label">决策</span>规则清单在价格之上；明细表标“未扣”；退订同屏</div>
+              <div class="bw-trace__step"><span class="bw-label">Token / 组件</span><code class="bw-code-inline">--bw-glass-solid</code> <code class="bw-code-inline">--bw-text-hero</code> Checklist Plan Table</div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="keywords" class="bw-section" aria-labelledby="t-keywords">
+        <div class="bw-section__head">
+          <p class="bw-section__id">#keywords</p>
+          <h2 id="t-keywords" class="bw-title">关键词与反关键词</h2>
+          <p class="bw-caption bw-prose">“不晚”取“天将黑未黑、一切还来得及”。视觉方向“暮光玻璃”：未来感来自玻璃与环境光，温暖来自杏色到玫瑰的暮光，高级来自颗粒质感和克制的留白。</p>
+        </div>
+        <div class="bw-rule-grid">
+          <div class="bw-rule bw-rule--do">
+            <p class="bw-rule__title"><svg class="bw-icon bw-icon--sm" aria-hidden="true"><use href="assets/icons.svg#check"/></svg>是</p>
+            <ul>
+              <li><b>暮光</b>：环境光而不是色块，像傍晚的天</li>
+              <li><b>玻璃</b>：层级靠材质，看得见角色也看得见界面</li>
+              <li><b>烛金</b>：被记住的东西会微微发亮</li>
+              <li><b>一根线</b>：共同经历连成一条线，接得上</li>
+              <li><b>成年人的温度</b>：亲密但克制</li>
+              <li><b>明白</b>：规则写在价格前面</li>
+            </ul>
+          </div>
+          <div class="bw-rule bw-rule--dont">
+            <p class="bw-rule__title"><svg class="bw-icon bw-icon--sm" aria-hidden="true"><use href="assets/icons.svg#close"/></svg>不是</p>
+            <ul>
+              <li><b>霓虹赛博</b>：冷蓝紫发光会让人联想到“不稳定的 AI 玩具”</li>
+              <li><b>糖果少女心</b>：幼态化让成年用户不适</li>
+              <li><b>游戏 HUD / 抽卡金光</b>：把关系变成交易</li>
+              <li><b>黑盒</b>：“AI 自己知道”，用户看不见记忆</li>
+              <li><b>倒计时、红点轰炸</b>：“怕被坑”的直接来源</li>
+              <li><b>玻璃叠玻璃</b>：好看但读不清；最多两层</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section id="pages" class="bw-section" aria-labelledby="t-pages">
+        <div class="bw-section__head">
+          <p class="bw-section__id">#pages</p>
+          <h2 id="t-pages" class="bw-title">核心页面</h2>
+          <p class="bw-caption bw-prose">五个页面与五个场景一一对应，全部由已登记的 Token、组件和布局模板拼成。下方是真实页面的实时预览，切换主题会同步。</p>
+        </div>
+        <div class="bw-gallery">
+          <figure class="bw-page-card"><div class="bw-device"><iframe class="bw-device__frame" src="pages/discover.html" title="S1 发现与开聊 页面预览" loading="lazy"></iframe></div><figcaption class="bw-caption"><a href="pages/discover.html">S1 发现角色与第一次开聊</a></figcaption></figure>
+          <figure class="bw-page-card"><div class="bw-device"><iframe class="bw-device__frame" src="pages/chat.html" title="S2 日常聊天 页面预览" loading="lazy"></iframe></div><figcaption class="bw-caption"><a href="pages/chat.html">S2 日常聊天会话</a></figcaption></figure>
+          <figure class="bw-page-card"><div class="bw-device"><iframe class="bw-device__frame" src="pages/return.html" title="S3 隔天回归 页面预览" loading="lazy"></iframe></div><figcaption class="bw-caption"><a href="pages/return.html">S3 隔天回归与记忆连续性</a></figcaption></figure>
+          <figure class="bw-page-card"><div class="bw-device"><iframe class="bw-device__frame" src="pages/control.html" title="S4 分支与纠正 页面预览" loading="lazy"></iframe></div><figcaption class="bw-caption"><a href="pages/control.html">S4 分支、关系推进与记忆纠正</a></figcaption></figure>
+          <figure class="bw-page-card"><div class="bw-device"><iframe class="bw-device__frame" src="pages/payment.html" title="S5 额度与付费 页面预览" loading="lazy"></iframe></div><figcaption class="bw-caption"><a href="pages/payment.html">S5 额度与付费决策</a></figcaption></figure>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+</body>
+</html>

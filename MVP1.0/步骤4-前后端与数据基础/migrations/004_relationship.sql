@@ -1,0 +1,18 @@
+ALTER TABLE relationship_states ADD COLUMN familiarity_basis_id TEXT;
+ALTER TABLE relationship_states ADD COLUMN intimacy_paused INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE conversation_uses ADD COLUMN temporary_familiarity TEXT;
+ALTER TABLE conversation_uses ADD COLUMN temporary_pace TEXT;
+ALTER TABLE generation_requests ADD COLUMN use_id TEXT REFERENCES conversation_uses(id);
+ALTER TABLE relationship_events ADD COLUMN use_id TEXT REFERENCES conversation_uses(id);
+ALTER TABLE relationship_events ADD COLUMN target_type TEXT;
+ALTER TABLE relationship_events ADD COLUMN target_familiarity TEXT;
+ALTER TABLE relationship_events ADD COLUMN revision INTEGER NOT NULL DEFAULT 1;
+ALTER TABLE relationship_events ADD COLUMN source_memory_id TEXT REFERENCES memories(id);
+CREATE TABLE relationship_message_tags(message_id TEXT PRIMARY KEY REFERENCES messages(id),conversation_id TEXT NOT NULL REFERENCES conversations(id),use_id TEXT,kind TEXT NOT NULL);
+CREATE TABLE relationship_inputs(generation_id TEXT PRIMARY KEY REFERENCES generation_requests(id),conversation_id TEXT NOT NULL REFERENCES conversations(id),use_id TEXT,revision INTEGER NOT NULL,effective_state TEXT NOT NULL);
+CREATE TABLE relationship_operations(conversation_id TEXT NOT NULL REFERENCES conversations(id),client_request_id TEXT NOT NULL,body_hash TEXT NOT NULL,result TEXT NOT NULL,PRIMARY KEY(conversation_id,client_request_id));
+ALTER TABLE conversation_uses ADD COLUMN temporary_relation_event_id TEXT REFERENCES relationship_events(id);
+ALTER TABLE conversation_uses ADD COLUMN temporary_familiarity_event_id TEXT REFERENCES relationship_events(id);
+ALTER TABLE conversation_uses ADD COLUMN temporary_pace_event_id TEXT REFERENCES relationship_events(id);
+ALTER TABLE relationship_states ADD COLUMN pace_basis_id TEXT REFERENCES relationship_events(id);
+ALTER TABLE relationship_events ADD COLUMN valid_until INTEGER;
