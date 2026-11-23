@@ -1,11 +1,14 @@
 /* =====================================================================
-   不晚 Design Tokens · 暮光玻璃 (Dusk Glass) · v1.0
+   不晚 Design Tokens · 静玻璃 (Still Glass) · v2.0 · 2026-11-23 定稿
+   黑白两色 + 玻璃只留在必要处 + 一点暮光（--bw-gradient-dusk / --bw-color-accent）
+   暮光分量（定稿）：页面顶角环境光 ≤ 20%、底部一点梅紫；全屏人物底部渐变与图上玻璃带梅紫暖调；白为偏暖奶白。
+   暮光渐变只用于进度、当前阶段；不得用于按钮或大面积底色。
    单一事实源：所有颜色、字号、间距、圆角、阴影、动效只允许在本文件定义。
    检索约定：
      @principle P0–P6   对应品牌原则（见 foundations.html#principles）
      @scene     S1–S5   对应核心场景
    命名：--bw-{类别}-{角色}-{变体}
-   主题：:root = 深色（品牌默认）；[data-theme="light"] = 浅色“暮光·浅”
+   主题：:root = 深色（品牌默认）；[data-theme="light"] = 浅色“静玻璃·浅”
    ===================================================================== */
 
 :root {
@@ -24,101 +27,109 @@
   --bw-plum-700: #4A1A3C;
   --bw-plum-900: #2A0F22;
   /* 烛金 ember：记忆专用 @principle P3 */
-  --bw-ember-200: #FFE3BD;
-  --bw-ember-300: #FFD9A8;
-  --bw-ember-700: #7A4D0F;
+  --bw-ember-200: #EFDCC0;
+  --bw-ember-300: #E3C9A1;
+  --bw-ember-700: #7A5A1E;
   /* 夜 night：深色中性 */
-  --bw-night-950: #0E080B;
-  --bw-night-900: #140C10;
-  --bw-night-800: #20121A;
+  --bw-night-950: #080506;
+  --bw-night-900: #0F0A0C;
+  --bw-night-800: #1B1317;
   /* 霞 dawn：浅色中性 */
-  --bw-dawn-50: #FFF9F5;
-  --bw-dawn-100: #FBF1EA;
-  --bw-ink-900: #2A151D;
-  --bw-ink-600: #6E5560;
-  --bw-ink-500: #7A626C;
+  --bw-dawn-50: #FBFAF8;
+  --bw-dawn-100: #F4F2EF;
+  --bw-ink-900: #141213;
+  --bw-ink-600: #5F595B;
+  --bw-ink-500: #6E686A;
 
   /* ---------- 1. 语义色 Color（深色） ---------- */
   --bw-color-bg: var(--bw-night-900);
   --bw-color-bg-deep: var(--bw-night-950);
-  --bw-color-text: #FCF2EC;                         /* 15.5:1 */
-  --bw-color-text-2: rgba(252, 242, 236, 0.72);     /* 8.6:1  次要信息 */
-  --bw-color-text-3: rgba(252, 242, 236, 0.54);     /* ≥4.8:1 提示、系统声部 @principle P0 */
-  --bw-color-line: rgba(255, 255, 255, 0.12);
-  --bw-color-line-strong: rgba(255, 255, 255, 0.24);
+  --bw-color-text: #F8EFEA;                         /* 15.5:1 */
+  --bw-color-text-2: rgba(245, 242, 238, 0.68);     /* 8.6:1  次要信息 */
+  --bw-color-text-3: rgba(245, 242, 238, 0.52);     /* ≥4.8:1 提示、系统声部 @principle P0 */
+  --bw-color-line: rgba(255, 255, 255, 0.08);
+  --bw-color-line-strong: rgba(255, 255, 255, 0.18);
   --bw-color-silhouette: rgba(30, 8, 20, 0.55);
 
-  /* 品牌 / 关系 @principle P1 P4 */
-  --bw-color-accent: var(--bw-rose-300);            /* 链接、强调文字 */
-  --bw-color-accent-soft: rgba(245, 126, 152, 0.16);
-  --bw-color-accent-border: rgba(255, 195, 155, 0.6);
-  --bw-gradient-accent: linear-gradient(135deg, var(--bw-apricot-300), var(--bw-rose-400));
-  --bw-color-on-accent: #2B0F18;                    /* 渐变深端上 7.0:1 */
+  /* 主色：黑白两色里的“白”。主按钮、发送键、选中的实底都用它 @principle P2 P6 */
+  --bw-color-primary: #F8EFEA;
+  --bw-color-primary-hover: #FFFFFF;
+  --bw-color-on-primary: #0C0A0B;
+  /* 一点暮光：整套界面里唯一的彩色。只用在进度、当前阶段、流式光标、焦点和选中描边这些“正在发生”的细处 @principle P1 */
+  --bw-gradient-dusk: linear-gradient(135deg, var(--bw-apricot-300), var(--bw-rose-400));
+
+  /* 强调（暮光的单色形态）与旧名兼容 @principle P1 P4 */
+  --bw-color-accent: #F2B8A2;            /* 链接、强调文字 */
+  --bw-color-accent-soft: rgba(242, 184, 162, 0.12);
+  --bw-color-accent-border: rgba(242, 184, 162, 0.46);
+  --bw-gradient-accent: linear-gradient(var(--bw-color-primary), var(--bw-color-primary));   /* 旧名：现在等同主色，新代码请用 --bw-color-primary */
+  --bw-color-on-accent: var(--bw-color-on-primary);                    /* 渐变深端上 7.0:1 */
 
   /* 记忆 @principle P3 @scene S3 S4 —— 只给记忆、约定、回顾使用 */
   --bw-color-memory: var(--bw-ember-300);
-  --bw-color-memory-soft: rgba(255, 200, 140, 0.12);
-  --bw-color-memory-soft-strong: rgba(255, 200, 140, 0.2);
-  --bw-color-memory-border: rgba(255, 210, 160, 0.32);
-  --bw-gradient-memory: linear-gradient(180deg, var(--bw-ember-300), rgba(255, 217, 168, 0));
+  --bw-color-memory-soft: rgba(227, 201, 161, 0.10);
+  --bw-color-memory-soft-strong: rgba(227, 201, 161, 0.18);
+  --bw-color-memory-border: rgba(227, 201, 161, 0.24);
+  --bw-gradient-memory: linear-gradient(180deg, var(--bw-ember-300), rgba(227, 201, 161, 0));
 
   /* 用户声部：墨在你手里 @principle P4 */
-  --bw-color-user-bubble: #FCEDE6;
-  --bw-color-user-text: #2B1219;
+  --bw-color-user-bubble: #F8EFEA;
+  --bw-color-user-text: #0C0A0B;
 
   /* 语义状态（全部配图标+文字，绝不只靠颜色） */
   --bw-color-success: #8FD3A8;
-  --bw-color-success-soft: rgba(143, 211, 168, 0.14);
-  --bw-color-warning: #FF9F6E;                      /* 偏橙红，与记忆烛金拉开色相 */
-  --bw-color-warning-soft: rgba(255, 159, 110, 0.14);
-  --bw-color-danger: #FF8A80;
-  --bw-color-danger-soft: rgba(255, 138, 128, 0.14);
-  --bw-color-info: #C9B8F5;
-  --bw-color-info-soft: rgba(201, 184, 245, 0.14);
-  --bw-color-focus: #FFD2B5;
+  --bw-color-success-soft: rgba(143, 211, 168, 0.12);
+  --bw-color-warning: #F2A27A;                      /* 偏橙红，与记忆烛金拉开色相 */
+  --bw-color-warning-soft: rgba(242, 162, 122, 0.12);
+  --bw-color-danger: #F28B82;
+  --bw-color-danger-soft: rgba(242, 139, 130, 0.12);
+  --bw-color-info: #BDB4E6;
+  --bw-color-info-soft: rgba(189, 180, 230, 0.12);
+  --bw-color-focus: #F2B8A2;
 
   /* ---------- 2. 材质 Material：玻璃 @principle P0 ---------- */
-  --bw-glass-1: rgba(255, 236, 228, 0.08);          /* 卡片、气泡 */
-  --bw-glass-2: rgba(255, 236, 228, 0.12);          /* 按钮、强调面 */
-  --bw-glass-hover: rgba(255, 236, 228, 0.18);
-  --bw-glass-solid: rgba(32, 18, 26, 0.88);         /* 输入、规则、弹窗：保证可读 @principle P6 */
-  --bw-glass-border: rgba(255, 255, 255, 0.14);
-  --bw-glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.18);
-  --bw-blur-1: blur(16px) saturate(1.3);
-  --bw-blur-2: blur(28px) saturate(1.5);
-  --bw-scrim: rgba(10, 4, 8, 0.62);
-  --bw-fade-bottom: linear-gradient(180deg, rgba(20, 12, 16, 0), rgba(20, 12, 16, 0.96) 30%);   /* 吸底区域渐隐，防止内容透出 @principle P0 */
+  --bw-glass-1: rgba(255, 232, 224, 0.07);          /* 卡片、气泡 */
+  --bw-glass-2: rgba(255, 232, 224, 0.10);          /* 按钮、强调面 */
+  --bw-glass-hover: rgba(255, 232, 224, 0.15);
+  --bw-glass-solid: rgba(28, 20, 24, 0.92);         /* 输入、规则、弹窗：保证可读 @principle P6 */
+  --bw-glass-border: rgba(255, 255, 255, 0.07);
+  --bw-glass-highlight: inset 0 0.5px 0 rgba(255, 255, 255, 0.14);
+  --bw-blur-1: blur(20px) saturate(1.5);
+  --bw-blur-2: blur(30px) saturate(1.6);
+  --bw-scrim: rgba(0, 0, 0, 0.6);
+  --bw-fade-bottom: linear-gradient(180deg, rgba(15, 10, 12, 0), rgba(15, 10, 12, 0.96) 30%);   /* 吸底区域渐隐，防止内容透出 @principle P0 */
 
-  /* 暮光环境光 + 颗粒 */
+  /* 环境光：只在页面顶角留一点暮光；颗粒已停用（透明度 0） */
   --bw-aurora:
-    radial-gradient(120% 60% at 0% 0%, rgba(255, 150, 96, 0.40), transparent 60%),
-    radial-gradient(90% 55% at 100% 18%, rgba(232, 86, 128, 0.34), transparent 62%),
-    radial-gradient(120% 60% at 50% 100%, rgba(120, 44, 120, 0.42), transparent 65%);
+    radial-gradient(85% 46% at 100% 0%, rgba(245, 126, 152, 0.19), transparent 64%),
+    radial-gradient(75% 42% at 0% 0%, rgba(255, 168, 119, 0.16), transparent 62%),
+    radial-gradient(90% 40% at 50% 100%, rgba(120, 44, 120, 0.10), transparent 66%);
   --bw-texture-grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url%28%23n%29'/></svg>");
-  --bw-grain-opacity: 0.14;
+  --bw-grain-opacity: 0;
   --bw-glow-orb: radial-gradient(circle at 35% 30%, var(--bw-apricot-300), var(--bw-rose-400) 45%, var(--bw-plum-700) 100%);
 
   /* 压在图片 / 纯黑上的界面：不随主题变化（浅色模式里同样保持深底浅字） @principle P0 @scene S1 */
   --bw-color-black: #000000;                        /* 底部标签栏、沉浸页底色 */
-  --bw-color-on-image: #FCF2EC;
-  --bw-color-on-image-2: rgba(252, 242, 236, 0.78);
-  --bw-color-on-image-3: rgba(252, 242, 236, 0.64);
-  --bw-color-on-image-line: rgba(255, 255, 255, 0.12);
-  --bw-glass-on-image: rgba(40, 26, 32, 0.26);      /* 毛玻璃开场面板 */
-  --bw-glass-on-image-border: rgba(255, 255, 255, 0.16);
-  --bw-glass-on-image-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.14);
-  --bw-glass-on-image-chip: rgba(255, 255, 255, 0.12);
-  --bw-input-on-image: rgba(0, 0, 0, 0.3);
+  --bw-color-on-image: #F8EFEA;
+  --bw-color-on-image-2: rgba(245, 242, 238, 0.78);
+  --bw-color-on-image-3: rgba(245, 242, 238, 0.62);
+  --bw-color-on-image-line: rgba(255, 255, 255, 0.1);
+  --bw-glass-on-image: rgba(46, 28, 35, 0.46);      /* 毛玻璃开场面板 */
+  --bw-glass-on-image-strong: rgba(44, 27, 34, 0.7);   /* 图上的对话气泡：比面板更实，保证连续阅读 */
+  --bw-glass-on-image-border: rgba(255, 255, 255, 0.06);
+  --bw-glass-on-image-highlight: inset 0 0.5px 0 rgba(255, 255, 255, 0.2);
+  --bw-glass-on-image-chip: rgba(255, 255, 255, 0.13);
+  --bw-input-on-image: rgba(44, 27, 34, 0.52);
   /* 全屏人物蒙层：顶部轻压（字标可读）+ 底部黑色渐变（操作区可读） */
-  --bw-scrim-spotlight: linear-gradient(180deg, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0) 14%, rgba(0, 0, 0, 0) 36%, rgba(0, 0, 0, 0.5) 58%, rgba(0, 0, 0, 0.78) 100%);
+  --bw-scrim-spotlight: linear-gradient(180deg, rgba(0, 0, 0, 0.32) 0%, rgba(0, 0, 0, 0) 15%, rgba(0, 0, 0, 0) 44%, rgba(40, 14, 26, 0.62) 70%, rgba(20, 7, 13, 0.94) 100%);
   --bw-blur-backdrop: blur(48px) saturate(1.2) brightness(0.45);   /* 宽屏两侧的同图模糊背景 */
   --bw-backdrop-scale: 1.12;
   --bw-avatar-zoom: 2.2;                              /* 真实头像：从全身立绘里放大取脸 @principle P1 */
   /* 首页原地对话：图上的气泡、对话区高度、顶部淡出遮罩 @principle P0 P5 @scene S1 S2 */
-  --bw-color-on-image-ink: #2B1219;                 /* 图上用户气泡（浅底）上的文字 */
+  --bw-color-on-image-ink: #0C0A0B;                 /* 图上用户气泡（浅底）上的文字 */
   --bw-thread-immersive-h: 40dvh;                   /* 对话区固定高度，人物的脸始终露在上方 */
   --bw-mask-fade-top: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 42%);   /* 越往上越透明 */
-  --bw-scrim-spotlight-chat: linear-gradient(180deg, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0) 14%, rgba(0, 0, 0, 0.12) 30%, rgba(0, 0, 0, 0.66) 52%, rgba(0, 0, 0, 0.9) 100%);
+  --bw-scrim-spotlight-chat: linear-gradient(180deg, rgba(0, 0, 0, 0.32) 0%, rgba(0, 0, 0, 0) 14%, rgba(36, 12, 24, 0.16) 30%, rgba(36, 12, 24, 0.68) 52%, rgba(18, 6, 12, 0.94) 100%);
 
   /* 角色立绘底（创作者扩展时可新增 --bw-portrait-n） @scene S1 */
   --bw-portrait-1: radial-gradient(70% 80% at 50% 30%, var(--bw-apricot-400) 0%, #D4577A 45%, var(--bw-plum-700) 100%);
@@ -126,12 +137,12 @@
   --bw-portrait-3: radial-gradient(70% 80% at 50% 30%, #F2C9A0 0%, #9C5A8A 50%, #24142E 100%);
 
   /* ---------- 3. 阴影与发光 Elevation ---------- */
-  --bw-shadow-1: 0 4px 16px rgba(10, 0, 6, 0.25);
-  --bw-shadow-2: 0 12px 32px rgba(10, 0, 6, 0.38);
-  --bw-shadow-3: 0 24px 64px rgba(10, 0, 6, 0.55);
-  --bw-glow-accent: 0 8px 24px rgba(245, 126, 152, 0.32);
-  --bw-glow-accent-strong: 0 10px 32px rgba(245, 126, 152, 0.48);
-  --bw-glow-memory: 0 0 18px rgba(255, 190, 120, 0.26);
+  --bw-shadow-1: 0 4px 16px rgba(0, 0, 0, 0.28);
+  --bw-shadow-2: 0 12px 32px rgba(0, 0, 0, 0.4);
+  --bw-shadow-3: 0 24px 64px rgba(0, 0, 0, 0.56);
+  --bw-glow-accent: 0 6px 20px rgba(0, 0, 0, 0.3);
+  --bw-glow-accent-strong: 0 8px 26px rgba(0, 0, 0, 0.42);
+  --bw-glow-memory: 0 0 0 rgba(0, 0, 0, 0);
 
   /* ---------- 4. 字体 Typography（只用 iOS 系统字体） ---------- */
   --bw-font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Helvetica Neue", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
@@ -178,6 +189,7 @@
   --bw-radius-md: 16px;
   --bw-radius-lg: 22px;   /* 气泡、小卡片 */
   --bw-radius-xl: 28px;   /* 卡片、弹窗 */
+  --bw-radius-tag: 8px;   /* 标签：小圆角矩形，不再用胶囊 */
   --bw-radius-pill: 999px;
   --bw-border-1: 1px;
   --bw-border-2: 2px;
@@ -245,22 +257,25 @@
   --bw-color-text: var(--bw-ink-900);
   --bw-color-text-2: var(--bw-ink-600);
   --bw-color-text-3: var(--bw-ink-500);
-  --bw-color-line: rgba(42, 21, 29, 0.10);
-  --bw-color-line-strong: rgba(42, 21, 29, 0.20);
+  --bw-color-line: rgba(20, 18, 19, 0.08);
+  --bw-color-line-strong: rgba(20, 18, 19, 0.16);
   --bw-color-silhouette: rgba(255, 255, 255, 0.5);
 
-  --bw-color-accent: var(--bw-rose-600);
-  --bw-color-accent-soft: rgba(184, 58, 94, 0.10);
-  --bw-color-accent-border: rgba(184, 58, 94, 0.45);
+  --bw-color-primary: #141213;
+  --bw-color-primary-hover: #2A2628;
+  --bw-color-on-primary: #FBFAF8;
+  --bw-color-accent: #93422E;
+  --bw-color-accent-soft: rgba(147, 66, 46, 0.08);
+  --bw-color-accent-border: rgba(147, 66, 46, 0.4);
 
   --bw-color-memory: var(--bw-ember-700);
-  --bw-color-memory-soft: rgba(230, 170, 80, 0.16);
-  --bw-color-memory-soft-strong: rgba(230, 170, 80, 0.26);
-  --bw-color-memory-border: rgba(180, 120, 40, 0.28);
-  --bw-gradient-memory: linear-gradient(180deg, #D9A441, rgba(217, 164, 65, 0));
+  --bw-color-memory-soft: rgba(160, 120, 50, 0.12);
+  --bw-color-memory-soft-strong: rgba(160, 120, 50, 0.2);
+  --bw-color-memory-border: rgba(122, 90, 30, 0.26);
+  --bw-gradient-memory: linear-gradient(180deg, #B8924A, rgba(184, 146, 74, 0));
 
   --bw-color-user-bubble: var(--bw-ink-900);
-  --bw-color-user-text: #FFF4EE;
+  --bw-color-user-text: #FBFAF8;
 
   --bw-color-success: #256847;
   --bw-color-success-soft: rgba(47, 122, 85, 0.10);
@@ -270,31 +285,30 @@
   --bw-color-danger-soft: rgba(180, 35, 24, 0.08);
   --bw-color-info: #6B4FA0;
   --bw-color-info-soft: rgba(107, 79, 160, 0.10);
-  --bw-color-focus: var(--bw-rose-600);
+  --bw-color-focus: #93422E;
 
-  --bw-glass-1: rgba(255, 255, 255, 0.55);
-  --bw-glass-2: rgba(255, 255, 255, 0.72);
-  --bw-glass-hover: rgba(255, 255, 255, 0.9);
-  --bw-glass-solid: rgba(255, 250, 246, 0.94);
-  --bw-glass-border: rgba(255, 255, 255, 0.85);
-  --bw-glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.9);
-  --bw-scrim: rgba(42, 21, 29, 0.32);
-  --bw-fade-bottom: linear-gradient(180deg, rgba(251, 241, 234, 0), rgba(251, 241, 234, 0.97) 30%);
+  --bw-glass-1: rgba(255, 255, 255, 0.62);
+  --bw-glass-2: rgba(255, 255, 255, 0.8);
+  --bw-glass-hover: rgba(255, 255, 255, 0.95);
+  --bw-glass-solid: rgba(255, 255, 255, 0.94);
+  --bw-glass-border: rgba(20, 18, 19, 0.06);
+  --bw-glass-highlight: inset 0 0.5px 0 rgba(255, 255, 255, 0.9);
+  --bw-scrim: rgba(20, 18, 19, 0.3);
+  --bw-fade-bottom: linear-gradient(180deg, rgba(244, 242, 239, 0), rgba(244, 242, 239, 0.97) 30%);
 
   --bw-aurora:
-    radial-gradient(110% 55% at 0% 0%, rgba(255, 186, 146, 0.60), transparent 62%),
-    radial-gradient(90% 50% at 100% 14%, rgba(245, 150, 178, 0.38), transparent 62%),
-    radial-gradient(120% 60% at 50% 100%, rgba(206, 176, 232, 0.42), transparent 66%);
-  --bw-grain-opacity: 0.06;
+    radial-gradient(85% 46% at 100% 0%, rgba(245, 126, 152, 0.17), transparent 64%),
+    radial-gradient(75% 42% at 0% 0%, rgba(255, 168, 119, 0.22), transparent 62%);
+  --bw-grain-opacity: 0;
   --bw-portrait-1: linear-gradient(160deg, var(--bw-apricot-200) 0%, #F2A88A 45%, #C88AAE 100%);
   --bw-portrait-2: linear-gradient(160deg, #FFE6D3 0%, #EFB3C3 50%, #B9A0DD 100%);
   --bw-portrait-3: linear-gradient(160deg, #F6DCC0 0%, #D59FB8 50%, #8E7BB8 100%);
 
-  --bw-shadow-1: 0 2px 10px rgba(120, 60, 50, 0.08);
-  --bw-shadow-2: 0 14px 36px rgba(120, 60, 50, 0.12);
-  --bw-shadow-3: 0 28px 64px rgba(90, 40, 40, 0.20);
-  --bw-glow-accent: 0 8px 22px rgba(240, 122, 149, 0.30);
-  --bw-glow-accent-strong: 0 10px 28px rgba(240, 122, 149, 0.42);
-  --bw-glow-memory: 0 0 14px rgba(240, 180, 90, 0.22);
+  --bw-shadow-1: 0 2px 10px rgba(20, 18, 19, 0.06);
+  --bw-shadow-2: 0 14px 36px rgba(20, 18, 19, 0.1);
+  --bw-shadow-3: 0 28px 64px rgba(20, 18, 19, 0.16);
+  --bw-glow-accent: 0 6px 18px rgba(20, 18, 19, 0.14);
+  --bw-glow-accent-strong: 0 8px 24px rgba(20, 18, 19, 0.2);
+  --bw-glow-memory: 0 0 0 rgba(0, 0, 0, 0);
   color-scheme: light;
 }

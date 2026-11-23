@@ -64,9 +64,9 @@ class Summaries:
         return [{'type':i['type'],'text':i['text']} for i in items if set(i['source_ids'])<=allowed and not set(i['source_ids'])<=in_window]
     def pending(self,c,cid):
         old=self.active(c,cid);covered=old['covered_to'] if old else 0
-        top=c.execute('SELECT coalesce(max(ordinal),0) FROM messages WHERE conversation_id=?',(cid,)).fetchone()[0]
+        top=c.execute('SELECT coalesce(max(ordinal),0) FROM messages WHERE conversation_id=? AND off_path=0',(cid,)).fetchone()[0]
         cutoff=top-WINDOW
-        rows=[dict(r) for r in c.execute("SELECT id,ordinal,role,content,status FROM messages WHERE conversation_id=? AND ordinal>? AND ordinal<=? AND role IN ('user','assistant') AND status IN ('saved','completed') ORDER BY ordinal LIMIT ?",(cid,covered,cutoff,MAX_BATCH))]
+        rows=[dict(r) for r in c.execute("SELECT id,ordinal,role,content,status FROM messages WHERE conversation_id=? AND off_path=0 AND ordinal>? AND ordinal<=? AND role IN ('user','assistant') AND status IN ('saved','completed') ORDER BY ordinal LIMIT ?",(cid,covered,cutoff,MAX_BATCH))]
         return old,rows
     def schedule(self,cid):
         if not self.provider or not self.provider.configured:return False
@@ -97,6 +97,11 @@ class Summaries:
                 covered_to=rows[-1]['ordinal'] if rows else 0
                 usable=self.memory.filter_context(c,cid,rows)
                 previous=json.loads(old['items']) if old else []
+                # Roadmap 2.1: items resting on another story line are not handed to the model, so they cannot be merged into this line's summary.
+                if previous:
+                    known=[dict(r) for r in c.execute('SELECT * FROM messages WHERE id IN (%s)'%','.join('?'*len({m for i in previous for m in i['source_ids']})),tuple({m for i in previous for m in i['source_ids']}))]
+                    allowed={r['id'] for r in self.memory.filter_context(c,cid,known)}
+                    previous=[i for i in previous if set(i['source_ids'])<=allowed]
                 roles={r['id']:r['role'] for r in usable}
                 prev_ids={m for i in previous for m in i['source_ids']}
                 if prev_ids:roles.update({r[0]:r[1] for r in c.execute('SELECT id,role FROM messages WHERE id IN (%s)'%','.join('?'*len(prev_ids)),tuple(prev_ids))})

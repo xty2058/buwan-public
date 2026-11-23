@@ -1,5 +1,5 @@
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from .api import Application
+from .api import Application, body_limit
 from .config import Config
 
 
@@ -25,8 +25,9 @@ def make_server(app, host=None, port=None):
                 self.send_error(400)
                 return
             # Oversize requests are rejected without reading or retaining their full body.
-            if length > 16384:
-                raw = b'x'*16385
+            limit = body_limit(self.command, self.path, self.headers.get('Content-Type'))
+            if length > limit:
+                raw = b'x'*(limit+1)
             else:
                 self.connection.settimeout(10)
                 try:

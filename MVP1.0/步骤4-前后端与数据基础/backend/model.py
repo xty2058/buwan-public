@@ -11,8 +11,8 @@ from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from urllib.parse import urlsplit
 
-# 林屿 DeepSeek 专属提示词的已注册版本；v1.2 保留用于回退。
-LINYU_DEEPSEEK_PROMPTS = ('linyu-v1.2', 'linyu-v1.4')
+# 林屿 DeepSeek 专属提示词的已注册版本；v1.4、v1.2 保留用于回退。
+LINYU_DEEPSEEK_PROMPTS = ('linyu-v1.8',)
 
 
 class ModelError(Exception):

@@ -132,9 +132,10 @@ class Memory:
         if call:
             c.execute('UPDATE memory_call_audit SET status=?,input_tokens=?,output_tokens=?,error_code=? WHERE id=?',(status,(usage or {}).get('input_tokens'),(usage or {}).get('output_tokens'),error,call));return call
         call=uid();c.execute('INSERT INTO memory_call_audit VALUES(?,?,?,?,?,?,?,?,?,?)',(call,cid,purpose,provider.mode,model,status,(usage or {}).get('input_tokens'),(usage or {}).get('output_tokens'),error,now()));return call
-    def sources_valid(self,c,mid):
+    def sources_valid(self,c,mid,on_path=True):
+        # on_path: a memory whose sources are on another story line (roadmap 2.1) is not valid on this one.
         sources=c.execute('SELECT m.* FROM messages m WHERE m.id IN (SELECT message_id FROM memory_sources WHERE memory_id=? UNION SELECT primary_source_id FROM memories WHERE id=?)',(mid,mid)).fetchall()
-        return bool(sources) and all(m['status'] in ('saved','completed') and not (m['role']=='assistant' and (not m['reply_to_id'] or m['status']!='completed')) for m in sources)
+        return bool(sources) and all(m['status'] in ('saved','completed') and not (on_path and m['off_path']) and not (m['role']=='assistant' and (not m['reply_to_id'] or m['status']!='completed')) for m in sources)
     def block_sources(self,c,cid,mid,reason):
         # Full-message exclusion is intentionally conservative: history remains visible.
         source_ids={r[0] for r in c.execute('SELECT message_id FROM memory_sources WHERE memory_id=?',(mid,))}
@@ -240,7 +241,7 @@ class Memory:
             c.execute('BEGIN IMMEDIATE');self.service.own(c,cid,user)
             args=[cid];extra=''
             if reply:extra=' AND m.id=?';args.append(reply)
-            eligible=c.execute("SELECT m.id FROM messages m WHERE conversation_id=? AND role='assistant' AND status='completed' AND reply_to_id IS NOT NULL"+extra+' ORDER BY ordinal DESC LIMIT 20',args).fetchall()
+            eligible=c.execute("SELECT m.id FROM messages m WHERE conversation_id=? AND off_path=0 AND role='assistant' AND status='completed' AND reply_to_id IS NOT NULL"+extra+' ORDER BY ordinal DESC LIMIT 20',args).fetchall()
             jobs=[]
             for row in eligible:
                 old=c.execute('SELECT * FROM memory_jobs WHERE conversation_id=? AND reply_id=?',(cid,row['id'])).fetchone()
@@ -258,7 +259,7 @@ class Memory:
                 job=dict(c.execute('SELECT * FROM memory_jobs WHERE id=?',(jid,)).fetchone());cid=job['conversation_id']
                 reply=c.execute("SELECT * FROM messages WHERE id=? AND status='completed'",(job['reply_id'],)).fetchone()
                 if not reply:raise ModelError('memory_source_invalid')
-                sources=[dict(m) for m in c.execute("SELECT id,role,content,status,created_at,reply_to_id FROM messages WHERE conversation_id=? AND ordinal<=? AND status IN ('saved','completed') AND id NOT IN (SELECT message_id FROM memory_context_blocks WHERE conversation_id=?) ORDER BY ordinal DESC LIMIT 6",(cid,reply['ordinal'],cid))]
+                sources=[dict(m) for m in c.execute("SELECT id,role,content,status,created_at,reply_to_id FROM messages WHERE conversation_id=? AND off_path=0 AND ordinal<=? AND status IN ('saved','completed') AND id NOT IN (SELECT message_id FROM memory_context_blocks WHERE conversation_id=?) ORDER BY ordinal DESC LIMIT 6",(cid,reply['ordinal'],cid))]
                 sources.reverse()
                 sources=self.filter_context(c,cid,sources)
                 if getattr(self,'relationship',None):sources=self.relationship.extraction_sources(c,cid,sources)
@@ -479,7 +480,7 @@ class Memory:
                 c.execute('BEGIN IMMEDIATE')
                 self.audit(c,m['conversation_id'],'index',self.embedding,'completed',{'input_tokens':usage},call=call)
                 current=c.execute("SELECT * FROM memories WHERE id=? AND revision=? AND status='confirmed'",(mid,revision)).fetchone()
-                if not current or not self.sources_valid(c,mid):return
+                if not current or not self.sources_valid(c,mid,on_path=False):return  # indexed whichever line is active
                 c.execute('INSERT OR REPLACE INTO memory_vectors VALUES(?,?,?,?,?)',(mid,revision,self.embedding.model,self.embedding.dimensions,json.dumps(vectors[0])))
                 c.execute("UPDATE memories SET index_status='ready',index_error_code=NULL WHERE id=? AND revision=?",(mid,revision))
         except Exception as exc:
@@ -555,6 +556,8 @@ class Memory:
         blocked.update(self.expired_context_blocks(c,cid))
         blocked.update(r[0] for r in c.execute('SELECT message_id FROM activity_memory_sources WHERE activity_id IN (SELECT id FROM activities WHERE conversation_id=?)',(cid,)))
         blocked.update(r[0] for r in c.execute('SELECT source_message_id FROM promise_lifecycle WHERE conversation_id=?',(cid,)))
+        # Roadmap 2.1: messages on other story lines never reach context, extraction, summaries or the scene ledger.
+        blocked.update(r[0] for r in c.execute('SELECT id FROM messages WHERE conversation_id=? AND off_path=1',(cid,)))
         return blocked
     def filter_context(self,c,cid,history):
         blocked=self.blocked_context_ids(c,cid)

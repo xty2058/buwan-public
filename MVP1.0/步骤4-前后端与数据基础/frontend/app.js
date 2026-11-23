@@ -2,7 +2,7 @@
 const $ = selector => document.querySelector(selector);
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const state = {user:null,csrf:null,characters:[],conversations:[],conversation:null,messages:[],memory:[],relationship:null,activity:null,activityList:null,activityId:null,archive:null,archiveError:null,
- latestUser:null,hasNewer:false,replyRequired:false,localRecord:{},restoreView:null,cacheWarning:false,capabilities:{},generation:null,stopping:false,streamError:null,page:'discover',role:'linyu',cid:null,loading:true,error:null,authMode:'login',busy:false,requestId:null,nextBefore:null};
+ latestUser:null,hasNewer:false,replyRequired:false,localRecord:{},restoreView:null,cacheWarning:false,capabilities:{},proactive:null,branches:null,replyOptions:null,voice:'idle',generation:null,stopping:false,streamError:null,page:'discover',role:'linyu',cid:null,loading:true,error:null,authMode:'login',busy:false,requestId:null,nextBefore:null};
 let epoch=0, pendingController=null, toastTimer, retryMessage=null;
 let streamController=null,streamSerial=0,reconcileTimer=null;
 let composingCid=null,delayedChatRender=false;
@@ -111,7 +111,7 @@ function renderInspector(){const facts=[['后端状态','同源 API'],['账号�
 function modal(title,body,actions=''){ $('#modal').innerHTML=`<section class="sheet" role="dialog" aria-modal="true" aria-label="${title}"><button class="close" data-action="close" aria-label="关闭">${icon('close')}</button><h2>${title}</h2>${body}${actions?`<div class="buttons">${actions}</div>`:''}</section>`;$('#modal input, #modal textarea, #modal button')?.focus();}
 function closeModal(){$('#modal').innerHTML='';}
 function setReturn(value){returnTo=value;if(value)storage.set('weiwan-return',JSON.stringify(value));else storage.delete('weiwan-return');}
-function clearPrivate({preserveGuestScene=false}={}){stopVoice();state.activity=null;state.activityList=null;state.activityId=null;state.archive=null;state.archiveError=null;activityDrafts.clear();activityPending.clear();try{Object.keys(sessionStorage).filter(k=>k.startsWith('weiwan-activity:')||k.startsWith('weiwan-archive:')).forEach(k=>storage.delete(k));}catch{}composingCid=null;delayedChatRender=false;if(typeof recoveryCache!=='undefined')recoveryCache.clear();state.latestUser=null;state.localRecord={};state.restoreView=null;stopObserving();state.generation=null;state.streamError=null;closeModal();if(!preserveGuestScene||state.user){for(const role of Object.keys(sceneDrafts))delete sceneDrafts[role];}drafts.clear();pendingMessages.clear();retryMessage=null;state.conversations=[];state.conversation=null;state.messages=[];state.useId=null;usesInDocument.clear();state.relationPending=null;state.relationSources=[];state.relationMemories=[];try{Object.keys(sessionStorage).filter(k=>k.startsWith('weiwan-rel-pending:')).forEach(k=>storage.delete(k));}catch{}state.memory=[];state.memoryInfo=null;state.editingMemory=null;state.relationship=null;state.csrf=null;try{Object.keys(sessionStorage).filter(k=>k.startsWith('weiwan-use:')).forEach(k=>storage.delete(k));}catch{}}
+function clearPrivate({preserveGuestScene=false}={}){stopVoice();state.branches=null;state.replyOptions=null;state.voice='idle';if(typeof voiceInput!=='undefined')voiceInput.stop(true);state.activity=null;state.activityList=null;state.activityId=null;state.archive=null;state.archiveError=null;activityDrafts.clear();activityPending.clear();try{Object.keys(sessionStorage).filter(k=>k.startsWith('weiwan-activity:')||k.startsWith('weiwan-archive:')).forEach(k=>storage.delete(k));}catch{}composingCid=null;delayedChatRender=false;if(typeof recoveryCache!=='undefined')recoveryCache.clear();state.latestUser=null;state.localRecord={};state.restoreView=null;stopObserving();state.generation=null;state.streamError=null;closeModal();if(!preserveGuestScene||state.user){for(const role of Object.keys(sceneDrafts))delete sceneDrafts[role];}drafts.clear();pendingMessages.clear();retryMessage=null;state.conversations=[];state.conversation=null;state.messages=[];state.useId=null;usesInDocument.clear();state.relationPending=null;state.relationSources=[];state.relationMemories=[];try{Object.keys(sessionStorage).filter(k=>k.startsWith('weiwan-rel-pending:')).forEach(k=>storage.delete(k));}catch{}state.memory=[];state.memoryInfo=null;state.editingMemory=null;state.relationship=null;state.csrf=null;try{Object.keys(sessionStorage).filter(k=>k.startsWith('weiwan-use:')).forEach(k=>storage.delete(k));}catch{}}
 function protect(){if(state.user)return true;setReturn({page:state.page,cid:state.cid,role:state.role});state.page='auth';state.loading=false;render();return false;}
 function encodeRoute(page,cid=state.cid,role=state.role){return '#/'+page+(['chat','memory','relationship','activity'].includes(page)?'/'+cid+(page==='activity'&&state.activityId?'/'+state.activityId:''):page==='detail'?'/'+role:'');}
 async function navigate(page,id){
@@ -142,15 +142,17 @@ async function loadRoute(){
     state.relationship=await api(relationshipUrl(),{signal});if(version!==epoch)return;
     restoreLocalRecovery();
     const data=await api(recoveryUrl(true),{signal});if(version!==epoch)return;applyRecovery(data,true);
+    state.branches=await api('/api/conversations/'+state.cid+'/branches',{signal,report:false}).catch(e=>{if(e.name==='AbortError')throw e;return null;});if(version!==epoch)return;
     if(state.capabilities.memory_write){const mem=await api('/api/conversations/'+state.cid+'/memories',{signal});if(version!==epoch)return;state.memory=mem.items;state.memoryInfo=mem;}
    }else if(state.page==='activity'){
     await ensureConversationUse(signal);if(version!==epoch)return;
     const data=await api('/api/conversations/'+state.cid+'/activities'+(state.activityId?'/'+state.activityId:''),{signal});if(version!==epoch)return;
     state.activity=state.activityId?data:null;state.activityList=state.activityId?null:data;restoreActivityPending();
    }else if(state.page==='memory'){const data=await api('/api/conversations/'+state.cid+'/memories',{signal});if(version!==epoch)return;state.memory=data.items;state.memoryInfo=data;}
-   else {await ensureConversationUse(signal);if(version!==epoch)return;const [data,history,mem]=await Promise.all([api(relationshipUrl(),{signal}),api('/api/conversations/'+state.cid+'/messages',{signal}),api('/api/conversations/'+state.cid+'/memories',{signal})]);if(version!==epoch)return;state.relationship=data;state.relationSources=history.items;state.relationMemories=mem.items;try{state.archive=await api('/api/conversations/'+state.cid+'/archive'+(state.useId?'?use_id='+state.useId:''),{signal});}catch(error){if(error.name==='AbortError')throw error;state.archiveError=error.message;}if(version!==epoch)return;try{state.relationPending=JSON.parse(storage.get(relationPendingKey())||'null')}catch{state.relationPending=null;}}
+   else {await ensureConversationUse(signal);if(version!==epoch)return;const [data,history,mem]=await Promise.all([api(relationshipUrl(),{signal}),api('/api/conversations/'+state.cid+'/messages',{signal}),api('/api/conversations/'+state.cid+'/memories',{signal})]);if(version!==epoch)return;state.relationship=data;state.relationSources=history.items;state.relationMemories=mem.items;state.proactive=null;api('/api/conversations/'+state.cid+'/proactive',{signal,report:false}).then(d=>{if(version===epoch){state.proactive=d;if(state.page==='relationship')render();}}).catch(()=>{});try{state.archive=await api('/api/conversations/'+state.cid+'/archive'+(state.useId?'?use_id='+state.useId:''),{signal});}catch(error){if(error.name==='AbortError')throw error;state.archiveError=error.message;}if(version!==epoch)return;try{state.relationPending=JSON.parse(storage.get(relationPendingKey())||'null')}catch{state.relationPending=null;}}
   }
   if(version!==epoch)return;state.loading=false;render();if(state.page==='chat'&&state.busy&&!state.localRecord.stop_intent)observeGeneration();
+  if(state.page==='chat'&&!state.busy)requestGreeting(version);
  }catch(error){if(error.name==='AbortError'||version!==epoch)return;if(error.status===401){clearPrivate();state.user=null;protect();return}state.loading=false;state.error=error;render();}
 }
 async function authSubmit(form){const version=epoch,mode=state.authMode,fields=new FormData(form),payload={username:fields.get('username'),password:fields.get('password'),...(mode==='register'?{nickname:fields.get('nickname'),...(fields.get('invite_code')?{invite_code:fields.get('invite_code').trim()}:{})}:{})};const submit=form.querySelector('button');submit.disabled=true;submit.textContent='处理中…';try{const data=await api('/api/auth/'+mode,{method:'POST',body:payload});if(version!==epoch)return;clearPrivate({preserveGuestScene:true});state.user=data.user;state.csrf=data.csrf_token;form.reset();const target=returnTo;setReturn(null);if(target){state.role=target.role;state.cid=target.cid;await navigate(target.page)}else{const convs=await api('/api/conversations');state.conversations=convs.items;await navigate(convs.items.length?'messages':'discover')}}catch(error){if(version!==epoch)return;$('#auth-error').innerHTML=`<div class="error">${esc(error.message)}${error.requestId?'<br>编号：'+esc(error.requestId):''}</div>`;submit.disabled=false;submit.textContent='重试'+(mode==='register'?'注册':'登录');}finally{payload.password='';}}
@@ -160,6 +162,17 @@ async function action(name,value,el){const version=epoch;try{switch(name){
  case 'chat':setImmersive(null);await navigate('chat',value);break;
  case 'home-continue':{const conv=state.conversations.find(c=>c.character_id===value);if(conv){state.role=value;setImmersive(conv.id);await navigate('chat',conv.id);}break;}
  case 'chat-full':setImmersive(null);render();break;
+ case 'suggest':{const cid=state.cid;el.disabled=true;el.classList.add('is-loading');const data=await api('/api/conversations/'+cid+'/suggestions',{method:'POST',body:{},report:false});if(version!==epoch||cid!==state.cid)return;state.replyOptions={cid,after:state.messages.at(-1)?.id,items:data.options};render();break;}
+ case 'use-option':{const o=state.replyOptions,item=o?.items[Number(value)];if(!item)break;state.replyOptions=null;addToDraft(o.cid,item.text);break;}
+ case 'close-options':state.replyOptions=null;render();break;
+ case 'branches':{const cid=state.cid,data=await api('/api/conversations/'+cid+'/branches');if(version!==epoch||cid!==state.cid)return;state.branches=data;modal('剧情线',branchesHTML());break;}
+ case 'branch-fork':modal('从这里另开一条线？','<p>新的一条线从这句话之后重新开始，这句话之前的内容都保留。</p><p>原来的线不会被改动，随时可以切回去；两条线之后聊出的内容、记忆和关系状态互不影响。</p>',button('另开一条线','branch-fork-confirm',value,'primary')+button('取消','close','','secondary'));break;
+ case 'branch-fork-confirm':{el.disabled=true;const data=await api('/api/conversations/'+state.cid+'/branches',{method:'POST',body:{message_id:value}});if(version!==epoch)return;await afterBranchChange(data,'已开出「'+(data.items.find(b=>b.active)?.name||'新的一条线')+'」，原来的线还在');break;}
+ case 'branch-switch':{el.disabled=true;const data=await api('/api/conversations/'+state.cid+'/branches/switch',{method:'POST',body:{branch_id:value||null}});if(version!==epoch)return;await afterBranchChange(data,'已切到「'+(data.items.find(b=>b.active)?.name||'主线')+'」');break;}
+ case 'branch-delete':{const b=state.branches?.items.find(x=>x.id===value);if(!b)break;modal('删除「'+esc(b.name)+'」？','<p>这条线上的 '+b.messages+' 条对话会一起删除，不能恢复。其他线不受影响。</p>',button('确认删除','branch-delete-confirm',value,'primary')+button('先不删','branches','','secondary'));break;}
+ case 'branch-delete-confirm':{el.disabled=true;const cid=state.cid,data=await api('/api/conversations/'+cid+'/branches/'+value,{method:'DELETE',body:{confirm:true}});if(version!==epoch||cid!==state.cid)return;state.branches=data;modal('剧情线',branchesHTML());render();toast('已删除');break;}
+ case 'proactive-toggle':{el.disabled=true;const cid=state.cid,data=await api('/api/conversations/'+cid+'/proactive',{method:'POST',body:{enabled:!state.proactive?.enabled}});if(version!==epoch||cid!==state.cid)return;state.proactive=data;render();toast(data.enabled?'已开启主动消息':'已关闭主动消息');break;}
+ case 'voice-input':await toggleVoiceInput(version);break;
  case 'chat-home':state.role=state.conversation?.character_id||state.role;await navigate('discover');break;
   case 'reload':await loadRoute();break;
   case 'login':setReturn({page:state.page,cid:state.cid,role:state.role});await navigate('auth');break;
@@ -233,7 +246,7 @@ async function action(name,value,el){const version=epoch;try{switch(name){
  case 'resume-saved-reply':{const source=currentUserMessage();if(source){const pending={type:'generation',content:source.content,user_message_id:source.id,generation_key:'reply_'+source.id};pendingMessages.set(state.cid,pending);persistLocalRecovery();await startReply(pending);}}break;
  case 'retry-candidate-create':await createCandidate(state.localRecord.candidate_intent?.original_reply_id,true);break;
  case 'earlier':el.disabled=true;{const oldArea=$('#chat-scroll'),oldHeight=oldArea.scrollHeight,oldTop=oldArea.scrollTop;const data=await api('/api/conversations/'+state.cid+'/messages?before='+state.nextBefore);if(version!==epoch)return;state.messages=[...data.items,...state.messages];state.nextBefore=data.next_before;render();const area=$('#chat-scroll');area.scrollTop=area.scrollHeight-oldHeight+oldTop;}break;
- }}catch(error){if(version!==epoch)return;if(error.status===401){clearPrivate();state.user=null;protect();return}toast(error.message);el.disabled=false;if(name==='start')el.textContent='重试开始聊天 →';}}
+ }}catch(error){if(version!==epoch)return;if(error.status===401){clearPrivate();state.user=null;protect();return}toast(error.message);el.disabled=false;el.classList?.remove('is-loading');if(name==='start')el.textContent='重试开始聊天 →';}}
 document.addEventListener('click',e=>{const el=e.target.closest('[data-action]');if(el&&!el.disabled)action(el.dataset.action,el.dataset.value,el);});
 document.addEventListener('error',e=>{const el=e.target;if(el?.tagName==='IMG'&&el.closest('.avatar'))el.hidden=true;},true);
 document.addEventListener('submit',async e=>{e.preventDefault();if(e.target.id==='auth-form')return authSubmit(e.target);if(e.target.classList?.contains('starter'))return homeStart(e.target);if(e.target.id==='message-form')return saveMessage();if(e.target.id==='activity-message-form')return sendActivityMessage(e.target);if(e.target.id==='memory-edit-form')return saveMemoryEdit(e.target);if(e.target.id==='relation-form'||e.target.id==='relation-edit-form')return submitRelationshipForm(e.target);if(e.target.id==='nickname-form'){const version=epoch,form=e.target,input=form.elements.nickname,submit=form.querySelector('button');submit.disabled=true;submit.textContent='保存中…';try{const data=await api('/api/profile',{method:'PATCH',body:{nickname:input.value}});if(version!==epoch)return;state.user.nickname=data.nickname;closeModal();render();toast('昵称已保存');}catch(error){if(version!==epoch)return;if(error.status===401){clearPrivate();state.user=null;protect();return}$('#nickname-error').innerHTML=`<div class="error">${esc(error.message)}</div>`;submit.disabled=false;submit.textContent='重试保存';}}});
@@ -267,6 +280,7 @@ function chatHTML(c){
  html=`<div class="chat-screen"><header class="chat-header"><button class="back" aria-label="返回消息" data-action="navigate" data-value="messages">${icon('chevron-left')}</button>${avatar(c.character_id)}<div class="name"><strong>${esc(c.character.name)}</strong><small>AI 角色 · 绑定 v${c.version}</small></div><button class="icon-button" data-action="records">记忆与关系</button></header><div class="foundation-note">${mode} · <a href="/evaluation">切换模型 / 回复评测 ↗</a></div>`;
  if(state.relationship?.state){const rs=state.relationship.state;html+='<div class="foundation-note">'+({unspecified:'未约定',friends:'朋友',romantic:'恋爱'}[rs.relationship_type]||'未约定')+' · '+({new:'初识',familiar:'熟悉',close:'亲近'}[rs.familiarity]||'初识')+(rs.intimacy_paused?' · 亲密表达已暂停':'')+(rs.pace?' · '+esc(rs.pace):'')+'</div>';}
  html+='<div class="activity-entry">'+button('一起读一篇短文 →','activity-intro','','text-action')+'</div>';
+ html+=branchBarHTML();
  if(c.has_newer_version)html+='<div class="version">已有对话继续使用原设定。</div>';
  }
  html+='<div class="scroll chat-area" id="chat-scroll" tabindex="0" aria-label="聊天记录">';
@@ -275,7 +289,7 @@ function chatHTML(c){
  for(const m of state.messages){
   // Roadmap 1.14: a deleted message keeps its place but shows no text or actions.
   if(m.deleted){html+=`<article class="message deleted ${m.role==='user'?'user':''}" id="${m.id}"><div class="bubble">这条消息已删除</div><div class="meta">已删除，不再用于后续聊天与记忆${messageTime(m.created_at)}</div></article>`;continue;}
-  const label=m.source_type==='activity'||(m.role==='system'&&m.content.startsWith('【共读进度记录'))?'共读记录':m.source_type==='promise_lifecycle'?'约定记录':m.role==='user'?'已保存':m.status==='streaming'?'正在回复':m.status==='pending'?'等待回复':m.status==='stopped'?'已停止 · 中断片段':m.status==='failed'?'未完成':m.reply_to_id?'已完成':m.content.startsWith('【关系操作】')?'用户关系操作':'预设开场';
+  const label=m.source_type==='activity'||(m.role==='system'&&m.content.startsWith('【共读进度记录'))?'共读记录':m.source_type==='promise_lifecycle'?'约定记录':m.role==='user'?'已保存':m.status==='streaming'?'正在回复':m.status==='pending'?'等待回复':m.status==='stopped'?'已停止 · 中断片段':m.status==='failed'?'未完成':m.reply_to_id?'已完成':m.content.startsWith('【关系操作】')?'用户关系操作':m.proactive?'主动消息':'预设开场';
   html+=`<article class="message ${m.role==='user'?'user':m.role==='system'?'system':''}" id="${m.id}"><div class="bubble">${esc(m.content)||(['pending','streaming'].includes(m.status)?'···':'（无已生成正文）')}</div><div class="meta">${label}${messageTime(m.created_at)}`;
   if(m===lastReply&&!candidate&&!active&&!(state.generation?.source_available===false&&state.generation?.request?.user_message_id===m.reply_to_id))html+=button('重新生成','regenerate',m.id,'text-action');
   if(m.content)html+=button('复制','copy-message',m.id,'text-action');
@@ -283,6 +297,8 @@ function chatHTML(c){
   const settled=!active&&!(candidate&&m===lastReply);
   if(settled&&m.role==='assistant'&&m.reply_to_id&&m.status==='completed')html+=button('说错了','wrong-reply',m.id,'text-action');
   if(settled&&!m.source_type&&((m.role==='user'&&m.status==='saved')||(m.role==='assistant'&&m.reply_to_id&&['completed','stopped','failed'].includes(m.status))))html+=button('删除','delete-message',m.id,'text-action');
+  // Roadmap 2.1: start another story line after any finished line of the character (not the newest: just keep talking).
+  if(settled&&m.role==='assistant'&&m.status==='completed'&&!m.source_type&&m!==state.messages.at(-1)&&!state.hasNewer)html+=button('从这里另开一条线','branch-fork',m.id,'text-action');
   if(m.activity_id)html+=button('回到共读活动','activity-open',m.activity_id,'text-action');
   html+='</div>'+(voiceEligible(m)?'<div class="voice-controls" data-voice-message="'+esc(m.id)+'">'+voiceHTML(m.id)+'</div>':'')+'</article>';
  }
@@ -308,9 +324,71 @@ function chatHTML(c){
  if(state.stopping)html+='<div class="foundation-note">停止处理中，界面已冻结追加…</div>';
  html+='</div>';
  if(immersive)html+=`<div class="spotlight-intro"><div class="home-head"><h2 class="home-name">${esc(c.character.name)}</h2><span class="home-job">${c.character.age} · ${esc(c.character.job)}</span></div><div class="tags"><span class="pill">AI 角色</span>${(c.character.tags||[]).map(t=>`<span class="pill">${esc(t)}</span>`).join('')}</div></div>`;
- html+=`<form id="message-form" class="composer"><div class="composer-input"><textarea id="draft" data-conversation="${esc(c.id)}" rows="1" enterkeyhint="enter" aria-label="聊天输入" placeholder="${candidate?'先决定候选，再继续聊天…':'想说什么，都可以慢慢说。'}">${esc(drafts.get(c.id)||'')}</textarea><small id="input-limit" aria-live="polite" hidden></small></div>`;
+ html+=`${replyOptionsHTML(c)}<form id="message-form" class="composer"><div class="composer-input"><div class="composer-row"><textarea id="draft" data-conversation="${esc(c.id)}" rows="1" enterkeyhint="enter" aria-label="聊天输入" placeholder="${candidate?'先决定候选，再继续聊天…':state.voice==='recording'?'正在听，说完点一下话筒…':state.voice==='transcribing'?'正在转成文字…':'想说什么，慢慢说。'}">${esc(drafts.get(c.id)||'')}</textarea>${composerTools(active||!!candidate)}</div><small id="input-limit" aria-live="polite" hidden></small></div>`;
  html+=active?button(state.stopping?'停止中':'■','stop-generation','','send'):('<button class="send" aria-label="发送" '+(state.busy||candidate||state.streamError?'disabled':'')+'>'+icon('arrow-up')+'</button>');
  return html+'</form>'+(immersive?nav('discover'):'')+'</div>';
+}
+// 路线 2.1：剧情线。原来的线一直都在；切换、另开都不新建会话。
+function currentBranch(){return state.branches?.items.find(b=>b.active)||null;}
+function branchBarHTML(){
+ const b=state.branches;if(!b||b.items.length<2)return '';
+ const now=currentBranch();
+ return `<div class="branch-bar">${icon('fork')}<span>现在在「${esc(now?.name||'主线')}」${now?.parent_name?' · 从「'+esc(now.parent_name)+'」分出':''}</span>${button('切换剧情线','branches','','text-action')}</div>`;
+}
+function branchesHTML(){
+ const b=state.branches;
+ return '<p>每条线有自己的对话、记忆和关系状态，互不影响。切走以后原来的线原样保留。</p><div id="branch-error"></div><ul class="branch-list">'+b.items.map(x=>
+  `<li class="depth-${Math.min(x.depth,3)}"><button type="button" class="branch" ${x.active?'aria-current="true"':'data-action="branch-switch"'} data-value="${esc(x.id||'')}">${icon(x.id?'fork':'knot')}<span><strong>${esc(x.name)}</strong><small>${x.id?'从「'+esc(x.fork_preview||'一条已删除的消息')+'」之后分出 · ':''}${x.messages} 条${x.preview?' · '+esc(x.preview):''}</small></span><em>${x.active?'正在聊':'切到这条'}</em></button>${x.deletable?button('删除这条线','branch-delete',x.id,'text-action'):''}</li>`).join('')+'</ul><p class="sheet-note">只能删除没有再分出别的线、也不是正在聊的线。最多 '+b.limit+' 条支线。</p>';
+}
+async function afterBranchChange(data,message){
+ state.branches=data;state.replyOptions=null;state.localRecord.view={at_latest:true};persistLocalRecovery();closeModal();
+ await navigate('chat',state.cid);toast(message);
+}
+// 路线 2.5：打开聊天时问一次服务端“要不要先说一句”。规则全在服务端；不出现、失败都不提示。
+async function requestGreeting(version){
+ const cid=state.cid;
+ try{const data=await api('/api/conversations/'+cid+'/greeting',{method:'POST',body:{},report:false});
+  if(!data.message||version!==epoch||cid!==state.cid||state.page!=='chat'||state.busy)return;
+  await refreshMessages(version);if(version===epoch)render();
+ }catch{}
+}
+// 路线 2.2 / 2.6：两个工具都只往输入框里写字，发不发由用户决定。
+function composerTools(blocked){
+ let html='';
+ if(state.capabilities.reply_suggestions)html+=`<button type="button" class="composer-tool" data-action="suggest" aria-label="帮我想想怎么回" title="帮我想想怎么回" ${blocked||state.voice!=='idle'?'disabled':''}>${icon('spark')}</button>`;
+ if(state.capabilities.voice_input)html+=`<button type="button" class="composer-tool${state.voice==='recording'?' is-recording':state.voice==='transcribing'?' is-loading':''}" data-action="voice-input" aria-label="${state.voice==='recording'?'说完了，转成文字':'语音输入'}" title="${state.voice==='recording'?'说完了，转成文字':'语音输入'}" aria-pressed="${state.voice==='recording'}" ${blocked||state.voice==='transcribing'?'disabled':''}>${icon('mic')}</button>`;
+ return html?'<div class="composer-tools">'+html+'</div>':'';
+}
+function replyOptionsHTML(c){
+ const o=state.replyOptions;if(!o||o.cid!==c.id||o.after!==state.messages.at(-1)?.id)return '';
+ return `<div class="reply-options" role="group" aria-label="可以这样回"><div class="reply-options-head"><span>可以这样回 · 点了只会填进输入框，可以再改</span><button type="button" class="text-action" data-action="close-options">收起</button></div>${o.items.map((x,i)=>`<button type="button" class="reply-option" data-action="use-option" data-value="${i}"><small>${esc(x.tone)}</small><span>${esc(x.text)}</span></button>`).join('')}</div>`;
+}
+function addToDraft(cid,text){
+ if(cid!==state.cid||state.page!=='chat')return;
+ drafts.set(cid,(drafts.get(cid)||'')+text);persistLocalRecovery();render();
+ const input=$('#draft');if(input){input.focus();input.setSelectionRange(input.value.length,input.value.length);}
+}
+let voiceStarting=false;
+async function toggleVoiceInput(version){
+ const cid=state.cid;
+ if(state.voice==='idle'){
+  if(!voiceInput.supported()){toast(window.isSecureContext?'这个浏览器不支持录音，可以直接打字':'当前链接不能使用话筒，请换成 https 链接，或直接打字');return;}
+  if(voiceStarting)return;voiceStarting=true;  // 权限弹窗还没答复时，再点一次不重复申请
+  try{await voiceInput.start(()=>toggleVoiceInput(epoch));}catch{toast('没有拿到话筒权限，可以在浏览器设置里允许，或直接打字');return;}finally{voiceStarting=false;}
+  if(version!==epoch||cid!==state.cid){voiceInput.stop(true);return;}
+  state.voice='recording';render();return;
+ }
+ if(state.voice!=='recording')return;
+ state.voice='transcribing';render();
+ try{
+  const wav=await voiceInput.stop();
+  if(!wav)throw new Error('没有录到声音，可以再说一次');
+  const response=await fetch('/api/conversations/'+cid+'/transcriptions',{method:'POST',credentials:'same-origin',cache:'no-store',headers:{'Content-Type':'audio/wav','X-CSRF-Token':state.csrf||''},body:wav});
+  const data=await response.json();
+  if(!response.ok)throw new RequestError(response.status,data);
+  if(version!==epoch){state.voice='idle';return;}
+  state.voice='idle';addToDraft(cid,data.text);if(cid!==state.cid)render();
+ }catch(error){state.voice='idle';if(version!==epoch)return;if(error.status===401){clearPrivate();state.user=null;protect();return}render();toast(error instanceof RequestError?error.message:(error.message&&/[\u4e00-\u9fa5]/.test(error.message)?error.message:'没有识别出来，可以再说一次或直接打字'));}
 }
 async function refreshMessages(version=epoch){
  const data=await api(recoveryUrl(true));if(version!==epoch)return;applyRecovery(data,false);
@@ -606,6 +684,7 @@ function relationshipHTML(c){
  let html=header('与'+c.character.name+'的关系','chat')+'<div class="scroll pad"><section class="relation-summary"><h2>'+labels[s.relationship_type]+' · '+labels[s.familiarity]+'</h2><p>相处节奏：'+esc(s.pace||'保守自然，尊重当次选择')+'</p><p>'+(s.intimacy_paused?'亲密表达已暂停。':'具体亲密行为仍需当次明确同意。')+'</p><small>当前显示含本次临时决定；长期关系：'+labels[s.persistent_type]+'。未保存决定不会跨次沿用。</small></section>';
  html+='<div class="record-actions">'+button('确认关系','relation-choice','set_relation')+button('调整熟悉程度','relation-choice','familiarity','secondary')+button('确认分歧修复','relation-choice','repair_event','secondary')+button('节奏与话题','relation-choice','pace','secondary')+button('结束恋爱 / 退回朋友','relation-choice','revoke','secondary')+button(s.intimacy_paused?'恢复亲密表达的确认':'暂停亲密表达','relation-choice',s.intimacy_paused?'resume_intimacy':'pause','secondary')+'</div>';
  html+='<p class="notice">不保存结束事件，也不会恢复旧恋爱关系。没有消息数升级或好感度分数。</p>';
+ if(state.proactive)html+='<article class="record"><small>主动消息 · '+(state.proactive.enabled?'已开启':'已关闭')+'</small><h3>隔了一阵再回来时，'+esc(c.character.name)+'先说一句</h3><p>只在你打开聊天时出现，一天最多一句，夜里 23 点到早上 8 点不出现。不会发通知，也不会在你离开时生成。</p><div class="record-actions">'+button(state.proactive.enabled?'关闭主动消息':'开启主动消息','proactive-toggle','','secondary')+'</div></article>';
  if(state.relationPending)html+='<div class="error">上次操作结果待核对，先刷新状态或重试原决定。'+button('重试原决定','relation-retry','','secondary')+'</div>';
  html+=archiveHTML();
  html+='<h3>关系事件与依据</h3>';

@@ -36,7 +36,11 @@ class Service:
     def annotate_deleted(self, c, conversation_id, messages):
         # Roadmap 1.14: deleted messages keep their place but not their text.
         deleted = {r[0] for r in c.execute('SELECT message_id FROM message_deletions WHERE conversation_id=?', (conversation_id,))}
+        # Roadmap 2.5: lines the character opened with on the user's return.
+        proactive = {r[0] for r in c.execute('SELECT message_id FROM proactive_messages WHERE conversation_id=?', (conversation_id,))}
         for message in messages:
+            if message['id'] in proactive:
+                message['proactive'] = True
             if message['id'] in deleted:
                 message.update(deleted=True, content='', voice_blocked=True)
         return messages
@@ -169,12 +173,15 @@ class Service:
             c.execute('INSERT INTO messages(id,conversation_id,ordinal,role,content,status,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?)',
                       (uid(), cid, 1, 'system' if adjusted else 'assistant', content, 'completed', timestamp, timestamp))
             c.execute('INSERT INTO relationship_states(conversation_id,updated_at) VALUES(?,?)', (cid, timestamp))
+            # Roadmap 2.1: the starting relationship state, so a story line begun from any message can restore it exactly.
+            c.execute('INSERT INTO relationship_checkpoints(conversation_id,branch_id,ordinal,snapshot,created_at) VALUES(?,NULL,0,?,?)',
+                      (cid, json.dumps({'state': {'relationship_type': 'unspecified', 'familiarity': 'new', 'pace': '', 'intimacy_paused': 0, 'basis_event_id': None, 'familiarity_basis_id': None, 'pace_basis_id': None}, 'events': {}}), timestamp))
             return cid, True
 
     def conversations(self, user_id):
         with self.db.connect() as c:
             result = rows(c, '''SELECT c.id,c.character_id,c.character_version_id,c.updated_at,v.version,v.public_profile,
-             (SELECT content FROM messages m WHERE m.conversation_id=c.id AND m.status NOT IN ('candidate','replaced','cancelled') AND (m.replaces_id IS NULL OR m.status='completed') ORDER BY ordinal DESC LIMIT 1) AS preview,
+             (SELECT content FROM messages m WHERE m.conversation_id=c.id AND m.off_path=0 AND m.status NOT IN ('candidate','replaced','cancelled') AND (m.replaces_id IS NULL OR m.status='completed') ORDER BY ordinal DESC LIMIT 1) AS preview,
              (SELECT status FROM generation_requests g WHERE g.conversation_id=c.id ORDER BY rowid DESC LIMIT 1) AS generation_status
              FROM conversations c JOIN character_versions v ON v.id=c.character_version_id
              WHERE c.user_id=? ORDER BY c.updated_at DESC,c.rowid DESC''', (user_id,))
@@ -199,7 +206,7 @@ class Service:
             raise ApiError(422, 'invalid_limit', '每次读取 1—200 条消息')
         with self.db.connect() as c:
             self.own(c, conversation_id, user_id)
-            data = rows(c, '''SELECT id,ordinal,role,content,status,created_at,updated_at,reply_to_id,replaces_id FROM messages WHERE conversation_id=? AND ordinal<?
+            data = rows(c, '''SELECT id,ordinal,role,content,status,created_at,updated_at,reply_to_id,replaces_id FROM messages WHERE conversation_id=? AND ordinal<? AND off_path=0
               AND status NOT IN ('candidate','replaced','cancelled') AND (replaces_id IS NULL OR status='completed') ORDER BY ordinal DESC LIMIT ?''', (conversation_id, before or 2**63-1, limit+1))
             has_more = len(data) > limit
             data = list(reversed(data[:limit]))

@@ -24,10 +24,13 @@ from .model import CompatibleProvider, ModelSettings
 from .activities import Activities
 from .tts import TTS
 from . import limits
-from . import evaluation
-from .inspection import Inspection
+from .memory_sources import MemorySources
 from .portrait import Portraits
 from . import export as exporter
+from .suggest import Suggestions
+from .proactive import Proactive
+from .branches import Branches
+from .asr import Transcriptions, body_limit
 
 ROOT = Path(__file__).resolve().parent.parent
 CAPABILITIES = {'accounts': True, 'message_storage': True, 'chat_generation': False,
@@ -64,7 +67,7 @@ def json_response(data, status=200, headers=None):
 
 
 class Application:
-    def __init__(self, config, provider=None, memory_provider=None, embedding_provider=None, tts_provider=None):
+    def __init__(self, config, provider=None, memory_provider=None, embedding_provider=None, tts_provider=None, asr_provider=None):
         self.config = config
         self.db = Database(config.db)
         self.db.migrate()
@@ -85,7 +88,7 @@ class Application:
         self.memory=Memory(self.db,self.service,self.chat,extractor,embedding_provider if embedding_provider is not None else (EmbeddingProvider.from_config() if self.chat.provider.mode=='live' else EmbeddingProvider()),self.logger)
         self.chat.memory=self.memory
         self.relationship=Relationships(self.db,self.service,self.memory,self.chat)
-        self.inspection=Inspection(self.db,self.service)
+        self.memory_sources=MemorySources(self.db,self.service)
         self.portraits=Portraits(self.db,self.service,self.memory,self.chat.provider)
         self.service.relationship=self.relationship
         self.chat.relationship=self.relationship
@@ -95,13 +98,19 @@ class Application:
         self.activities=Activities(self.db,self.service,self.chat,self.memory,self.relationship)
         self.tts=TTS(self.db,self.service,provider=tts_provider,chat=self.chat)
         self.service.voice=self.tts
+        self.suggestions=Suggestions(self.db,self.service,self.memory,self.chat)
+        self.proactive=Proactive(self.db,self.service,self.memory,self.chat,self.relationship)
+        self.branches=Branches(self.db,self.service,self.memory,self.relationship)
+        # Tests never reach a real speech provider: without an explicit one, voice input is on only for the live reply model.
+        self.transcriptions=Transcriptions(self.db,self.service,self.memory,asr_provider if asr_provider is not None else (None if provider is None and self.chat.provider.mode=='live' else False))
         self.report_lock = threading.Lock()
         self.report_counts = {}
 
     def capabilities(self):
         return {**CAPABILITIES, **self.chat.capabilities(), **self.memory.capabilities(),
                 'relationship_write': True, 'activities': True, 'relationship_archive': True,
-                **self.tts.capabilities(),
+                **self.tts.capabilities(), **self.transcriptions.capabilities(),
+                'reply_suggestions': bool(self.suggestions.provider and self.suggestions.provider.configured),
                 'invite_required': self.config.invite_required,
                 'guest_trial': self.guest_allowed(),
                 **({'chat_roles': [r for r in self.chat.capabilities().get('chat_roles', []) if r in self.config.open_characters]}
@@ -133,16 +142,21 @@ class Application:
             if method in ('POST', 'PATCH', 'DELETE'):
                 if headers.get('origin') != self.config.origin:
                     raise ApiError(403, 'origin_rejected', '请求来源不正确')
-                if not headers.get('content-type', '').lower().startswith('application/json'):
+                audio = body_limit(method, target, headers.get('content-type')) != 16384
+                if not audio and not headers.get('content-type', '').lower().startswith('application/json'):
                     raise ApiError(415, 'json_required', '请使用 JSON 请求')
-                if len(raw) > 16384:
+                if len(raw) > body_limit(method, target, headers.get('content-type')):
                     raise ApiError(413, 'body_too_large', '请求内容过长')
-                try:
-                    body = json.loads(raw.decode('utf-8') or '{}')
-                except (ValueError, UnicodeError):
-                    raise ApiError(400, 'invalid_json', '请求内容格式不正确')
-                if not isinstance(body, dict):
-                    raise ApiError(400, 'invalid_json_object', '请求应为 JSON 对象')
+                if audio:
+                    # Voice input (roadmap 2.6): the only non-JSON body, passed through untouched.
+                    body = {'audio': raw}
+                else:
+                    try:
+                        body = json.loads(raw.decode('utf-8') or '{}')
+                    except (ValueError, UnicodeError):
+                        raise ApiError(400, 'invalid_json', '请求内容格式不正确')
+                    if not isinstance(body, dict):
+                        raise ApiError(400, 'invalid_json_object', '请求应为 JSON 对象')
             else:
                 body = {}
             response = self.dispatch(method, target, headers, body, address, request_id)
@@ -166,7 +180,7 @@ class Application:
 
     @staticmethod
     def route_label(method, path):
-        if path in ('/', '/index.html', '/app.js', '/style.css', '/recovery-cache.js', '/mobile-layout.js', '/assets/favicon.svg', '/api/health', '/api/auth/session',
+        if path in ('/', '/index.html', '/app.js', '/style.css', '/recovery-cache.js', '/mobile-layout.js', '/voice-input.js', '/assets/favicon.svg', '/api/health', '/api/auth/session',
                     '/api/auth/register', '/api/auth/login', '/api/auth/logout', '/api/profile',
                     '/api/characters', '/api/conversations', '/api/client-errors', '/api/inspection/metrics', '/inspect', '/inspect.js', '/inspect.css'):
             return path
@@ -175,13 +189,17 @@ class Application:
         for pattern, label in [(r'/api/characters/[^/]+', '/api/characters/:id'),
                                (r'/api/conversations/[^/]+/activities(?:/[^/]+(?:/messages)?)?', '/api/conversations/:id/activities'),
                                (r'/api/conversations/[^/]+/archive', '/api/conversations/:id/archive'),
+                               (r'/api/conversations/[^/]+/branches(?:/[^/]+)?', '/api/conversations/:id/branches'),
                                (r'/api/conversations/[^/]+/messages/[^/]+/audio(?:/content)?', '/api/conversations/:id/messages/:id/audio'),
-                               (r'/api/conversations/[^/]+(?:/(messages|memories|relationships|uses|generations|recovery|recalls|portrait|export))?', '/api/conversations/:id'),
+                               (r'/api/conversations/[^/]+(?:/(messages|memories|relationships|uses|generations|recovery|recalls|portrait|export|suggestions|transcriptions|proactive|greeting))?', '/api/conversations/:id'),
                                (r'/api/conversations/[^/]+/generations/[^/]+(?:/(stream|stop|retry|choice))?', '/api/conversations/:id/generations/:id'),
                                (r'/api/conversations/[^/]+/memories/[^/]+', '/api/conversations/:id/memories/:id'),
                                (r'/api/conversations/[^/]+/memories/[^/]+/history', '/api/conversations/:id/memories/:id/history'),
                                (r'/api/conversations/[^/]+/messages/[^/]+/(?:delete|recalled)', '/api/conversations/:id/messages/:id/action'),
-                               (r'/api/conversations/[^/]+/uses/[^/]+/close', '/api/conversations/:id/uses/:id/close')]:
+                               (r'/api/conversations/[^/]+/uses/[^/]+/close', '/api/conversations/:id/uses/:id/close'),
+                               (r'/api/evaluation/rounds(?:/[^/]+(?:/reviews)?)?', '/api/evaluation/rounds'),
+                               (r'/api/evaluation/generators', '/api/evaluation/generators'),
+                               (r'/evaluation/review|/evaluation-review\.(?:js|css)', '/evaluation/review')]:
             if re.fullmatch(pattern, path):
                 return label
         return 'unmatched'
@@ -196,36 +214,17 @@ class Application:
             if asset.is_file():
                 return Response(200, asset.read_bytes(), {'Content-Type': BUWAN_FILES[path], 'Cache-Control': 'public, max-age=300'})
         internal = ('/inspect', '/inspect.js', '/inspect.css', '/evaluation', '/evaluation.js', '/evaluation.css',
-                    '/api/evaluation', '/api/evaluation/results', '/api/evaluation/reply')
-        if not self.config.internal_tools and (path in internal or path.startswith('/api/inspection/')):
+                    '/api/evaluation', '/api/evaluation/results', '/api/evaluation/reply',
+                    '/evaluation/review', '/evaluation-review.js', '/evaluation-review.css')
+        if (path in internal or path.startswith(('/api/inspection/', '/api/evaluation/rounds', '/api/evaluation/generators'))):
             raise ApiError(404, 'not_found', '页面不存在')
-        if method == 'GET' and path in ('/inspect', '/inspect.js', '/inspect.css'):
-            # Internal recall inspector (roadmap 1.13). The page is static; its data APIs require login.
-            name = 'inspect.html' if path == '/inspect' else path[1:]
-            mime = {'inspect.html':'text/html', 'inspect.js':'text/javascript', 'inspect.css':'text/css'}[name]
-            return Response(200, (ROOT/'frontend'/name).read_bytes(), {'Content-Type':mime+'; charset=utf-8'})
-        if method == 'GET' and path in ('/evaluation', '/evaluation.js', '/evaluation.css'):
-            name = 'evaluation.html' if path == '/evaluation' else path[1:]
-            mime = {'evaluation.html':'text/html', 'evaluation.js':'text/javascript', 'evaluation.css':'text/css'}[name]
-            return Response(200, (ROOT/'frontend'/name).read_bytes(), {'Content-Type':mime+'; charset=utf-8'})
-        if method == 'GET' and path == '/api/evaluation/results':
-            result_dir=ROOT.parent.parent/'MVP1.1/评测结果'
-            combined={'batches':[], 'records':[]}
-            for name in ('deepseek-suite.json', 'deepseek-prompt-v1.1.json', 'deepseek-prompt-v1.2.json', 'qwen-plus-prompt-v1.2.json', 'qwen-plus-isolated-v1.json', 'qwen-plus-isolated-v2.json', 'qwen-plus-isolated-v3.json'):
-                result_file=result_dir/name
-                if result_file.exists():
-                    saved=json.loads(result_file.read_text())
-                    for key in combined: combined[key].extend(saved.get(key, []))
-            return json_response(combined)
-        if method == 'GET' and path == '/api/evaluation':
-            return json_response(evaluation.catalogue())
         if method == 'GET' and path == '/assets/favicon.svg':
             asset = ROOT/'frontend'/'assets'/'favicon.svg'
             if asset.is_file():
                 return Response(200, asset.read_bytes(), {'Content-Type': 'image/svg+xml', 'Cache-Control': 'public, max-age=3600'})
-        if method == 'GET' and path in ('/', '/index.html', '/app.js', '/style.css', '/recovery-cache.js', '/mobile-layout.js'):
+        if method == 'GET' and path in ('/', '/index.html', '/app.js', '/style.css', '/recovery-cache.js', '/mobile-layout.js', '/voice-input.js'):
             name = 'index.html' if path == '/' else path[1:]
-            mime = {'index.html': 'text/html', 'app.js': 'text/javascript', 'style.css': 'text/css', 'recovery-cache.js': 'text/javascript', 'mobile-layout.js':'text/javascript'}[name]
+            mime = {'index.html': 'text/html', 'app.js': 'text/javascript', 'style.css': 'text/css', 'recovery-cache.js': 'text/javascript', 'mobile-layout.js':'text/javascript', 'voice-input.js':'text/javascript'}[name]
             return Response(200, (ROOT/'frontend'/name).read_bytes(), {'Content-Type': mime+'; charset=utf-8'})
         if method == 'GET' and path == '/api/health':
             with self.db.connect() as c:
@@ -237,10 +236,6 @@ class Application:
         match = re.fullmatch(r'/api/characters/([^/]+)', path)
         if method == 'GET' and match:
             return json_response(self.service.character(match[1]))
-        if method == 'POST' and path == '/api/evaluation/reply':
-            # Local tool by design (Origin-checked, no login). It makes paid calls, so hosted
-            # deployments set APP_INTERNAL_TOOLS=false and this route answers 404 above.
-            return json_response(evaluation.generate(body))
         token = self.auth.token_from_cookie(headers.get('cookie'))
         if method == 'GET' and path == '/api/auth/session':
             try:
@@ -309,8 +304,6 @@ class Application:
             if method == 'GET' and resource == 'content':
                 audio, mime = self.tts.audio(user,cid,mid,query.get('use_id',[None])[0])
                 return Response(200,audio,{'Content-Type':mime})
-        if method == 'GET' and path == '/api/inspection/metrics':
-            return json_response(self.inspection.metrics(user['id']))
         if path == '/api/conversations':
             if method == 'GET':
                 return json_response({'items': self.service.conversations(user['id'])})
@@ -323,7 +316,7 @@ class Application:
             if method == 'POST' and resource == 'delete':
                 return json_response(self.memory.delete_message(user['id'], cid, mid))
             if method == 'GET' and resource == 'recalled':
-                return json_response(self.inspection.recalled_for_message(user['id'], cid, mid))
+                return json_response(self.memory_sources.recalled_for_message(user['id'], cid, mid))
         match = re.fullmatch(r'/api/conversations/([a-f0-9]{32})/memories/([a-f0-9]{32})/history', path)
         if method == 'GET' and match:
             return json_response(self.memory.history(user['id'], match[1], match[2]))
@@ -334,6 +327,35 @@ class Application:
                 return json_response(self.portraits.read(user['id'], match[1]))
             if method == 'POST':
                 return json_response(self.portraits.generate(user['id'], match[1]))
+        match = re.fullmatch(r'/api/conversations/([a-f0-9]{32})/branches(?:/(switch|[a-f0-9]{32}))?', path)
+        if match:
+            # Roadmap 2.1: story lines inside this conversation.
+            cid, target = match.groups()
+            if method == 'GET' and not target:
+                return json_response(self.branches.list(user, cid))
+            if method == 'POST' and not target:
+                return json_response(self.branches.fork(user, cid, body), 201)
+            if method == 'POST' and target == 'switch':
+                return json_response(self.branches.switch(user, cid, body))
+            if method == 'DELETE' and target and target != 'switch':
+                return json_response(self.branches.delete(user, cid, target, body))
+        match = re.fullmatch(r'/api/conversations/([a-f0-9]{32})/(proactive|greeting)', path)
+        if match:
+            # Roadmap 2.5: the switch, and the one request the client makes when a chat is opened.
+            if match[2] == 'proactive' and method == 'GET':
+                return json_response(self.proactive.read(user, match[1]))
+            if match[2] == 'proactive' and method == 'POST':
+                return json_response(self.proactive.configure(user, match[1], body))
+            if match[2] == 'greeting' and method == 'POST':
+                return json_response(self.proactive.greet(user, match[1]))
+        match = re.fullmatch(r'/api/conversations/([a-f0-9]{32})/(suggestions|transcriptions)', path)
+        if method == 'POST' and match:
+            # Roadmap 2.2 / 2.6: both only produce text for the input box; nothing is sent or stored as a message.
+            if match[2] == 'suggestions':
+                return json_response(self.suggestions.suggest(user, match[1]))
+            if 'audio' not in body:
+                raise ApiError(415, 'wav_required', '请上传 WAV 录音')
+            return json_response(self.transcriptions.transcribe(user, match[1], body['audio']))
         match = re.fullmatch(r'/api/conversations/([a-f0-9]{32})/export', path)
         if method == 'GET' and match:
             # Roadmap 1.10: the owner's own chat, memories and relationship record.
@@ -342,13 +364,6 @@ class Application:
             if query.get('format', ['json'])[0] == 'md':
                 return Response(200, exporter.markdown(data).encode(), {'Content-Type': 'text/markdown; charset=utf-8', 'Content-Disposition': 'attachment; filename="' + name + '.md"', 'Cache-Control': 'no-store'})
             return Response(200, json.dumps(data, ensure_ascii=False, indent=2).encode(), {'Content-Type': 'application/json; charset=utf-8', 'Content-Disposition': 'attachment; filename="' + name + '.json"', 'Cache-Control': 'no-store'})
-        match = re.fullmatch(r'/api/conversations/([a-f0-9]{32})/recalls', path)
-        if method == 'GET' and match:
-            try:
-                limit = int(query.get('limit', ['50'])[0])
-            except ValueError:
-                raise ApiError(422, 'invalid_cursor', '分页参数不正确')
-            return json_response(self.inspection.recalls(user['id'], match[1], limit))
         match = re.fullmatch(r'/api/conversations/([a-f0-9]{32})(?:/(messages|memories|relationships|uses|recovery))?', path)
         if match:
             cid, resource = match.groups()

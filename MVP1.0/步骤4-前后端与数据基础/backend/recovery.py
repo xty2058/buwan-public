@@ -3,7 +3,7 @@ import re
 from .db import rows
 from .errors import ApiError
 
-VISIBLE="status NOT IN ('candidate','replaced','cancelled') AND (replaces_id IS NULL OR status='completed')"
+VISIBLE="off_path=0 AND status NOT IN ('candidate','replaced','cancelled') AND (replaces_id IS NULL OR status='completed')"
 FIELDS='id,ordinal,role,content,status,created_at,updated_at,reply_to_id,replaces_id'
 
 
@@ -29,7 +29,7 @@ class Recovery:
             self.service.annotate_voice_blocked(c,cid,messages,user_id)
             self.service.annotate_deleted(c,cid,messages)
             newer=bool(messages and c.execute('SELECT 1 FROM messages WHERE conversation_id=? AND ordinal>? AND '+VISIBLE,(cid,messages[-1]['ordinal'])).fetchone())
-            last_user=c.execute("SELECT "+FIELDS+" FROM messages WHERE conversation_id=? AND role='user' AND status='saved' AND id NOT IN (SELECT message_id FROM message_deletions WHERE conversation_id=?) ORDER BY ordinal DESC LIMIT 1",(cid,cid)).fetchone()
+            last_user=c.execute("SELECT "+FIELDS+" FROM messages WHERE conversation_id=? AND off_path=0 AND role='user' AND status='saved' AND id NOT IN (SELECT message_id FROM message_deletions WHERE conversation_id=?) ORDER BY ordinal DESC LIMIT 1",(cid,cid)).fetchone()
             current_request=c.execute('SELECT id FROM generation_requests WHERE conversation_id=? AND user_message_id=? ORDER BY rowid DESC LIMIT 1',(cid,last_user['id'])).fetchone() if last_user else None
             generation=self.chat.snapshot(user_id,cid,current_request['id'],connection=c,session_id=session_id,use_id=use_id) if current_request else {'request':None}
             root=c.execute("SELECT id FROM generation_requests WHERE conversation_id=? AND user_message_id=? AND kind='reply'",(cid,last_user['id'])).fetchone() if last_user else None

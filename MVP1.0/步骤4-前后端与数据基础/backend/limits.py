@@ -1,9 +1,11 @@
 """Daily reply caps for the hosted service (APP_DAILY_REPLY_LIMIT per user, APP_DAILY_TOTAL_LIMIT site-wide).
 
 A "reply" is one model generation the user asked for: a chat reply or regeneration, or a reply while
-reading together. Failed attempts do not count (the product promise is that failures are free);
-stopped ones do, because the provider already billed them. Days follow the Beijing calendar.
-Memory extraction, rerank, summaries and embeddings scale with replies, so capping replies bounds them.
+reading together. Failed attempts do not count; pending, running and stopped requests do.
+Stopped requests may already incur provider costs. These operational caps are NOT paid credits.
+Future paid-credit settlement must exempt failed and user-stopped incomplete replies.
+Days follow the Beijing calendar. Auxiliary model calls are not individually counted here;
+these caps are not an exact monetary budget.
 0 means unlimited (the local default).
 """
 import time

@@ -10,7 +10,7 @@ from datetime import datetime
 
 from .timeline import BEIJING
 
-VISIBLE = "status NOT IN ('candidate','replaced','cancelled','pending','streaming') AND (replaces_id IS NULL OR status='completed')"
+VISIBLE = "off_path=0 AND status NOT IN ('candidate','replaced','cancelled','pending','streaming') AND (replaces_id IS NULL OR status='completed')"
 ROLE = {'user': '我', 'system': '记录'}
 KIND = {'user_fact': '关于我', 'boundary': '相处边界', 'promise': '约定', 'experience': '共同经历', 'relationship': '关系'}
 STATUS = {'confirmed': '已记住', 'candidate': '待确认', 'conflicted': '待确认（与已有记忆冲突）'}

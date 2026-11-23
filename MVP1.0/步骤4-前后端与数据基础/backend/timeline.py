@@ -101,7 +101,7 @@ def mentioned(reply, content):
 
 def previous_message_time(c, cid, source_ordinal):
     # The user's own previous message: the character's opening line is not a sitting.
-    row = c.execute("SELECT max(created_at) FROM messages WHERE conversation_id=? AND ordinal<? "
+    row = c.execute("SELECT max(created_at) FROM messages WHERE conversation_id=? AND off_path=0 AND ordinal<? "
                     "AND role='user' AND status='saved'", (cid, source_ordinal)).fetchone()
     return row[0] if row else None
 
@@ -119,11 +119,15 @@ def pending_promises(c, cid, current, previous):
            JOIN messages s ON s.id=m.primary_source_id
            WHERE m.conversation_id=? AND m.kind='promise' AND m.status='confirmed'
              AND (m.valid_until IS NULL OR m.valid_until>?)
+             AND s.off_path=0
              AND m.id NOT IN (SELECT memory_id FROM promise_lifecycle WHERE conversation_id=?)
-             AND m.id NOT IN (SELECT memory_id FROM promise_offers WHERE conversation_id=? AND delivered=1)
+             AND m.id NOT IN (SELECT o.memory_id FROM promise_offers o JOIN generation_requests g ON g.id=o.generation_id
+                              JOIN messages u ON u.id=g.user_message_id WHERE o.conversation_id=? AND o.delivered=1 AND u.off_path=0)
+             AND m.id NOT IN (SELECT p.promise_id FROM proactive_messages p JOIN messages x ON x.id=p.message_id
+                              WHERE p.conversation_id=? AND p.promise_id IS NOT NULL AND x.off_path=0)
              AND s.created_at<=?
            ORDER BY s.created_at DESC LIMIT ?""",
-        (cid, current, cid, cid, previous, MAX_PROMISES)).fetchall()
+        (cid, current, cid, cid, cid, previous, MAX_PROMISES)).fetchall()
     return [{'id': r['id'], 'content': r['content'], '约定时间': ago_label(r['made_at'], current)} for r in rows]
 
 

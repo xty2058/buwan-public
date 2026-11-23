@@ -52,7 +52,7 @@ def main():
         'base_url': 'https://api.deepseek.com', 'key_file': secret('deepseek', os.environ['DEEPSEEK_API_KEY']),
         'approval_id': approval, 'max_calls': None, 'max_output_tokens': 512, 'timeout': 60,
         'input_price': '', 'output_price': '', 'currency': '', 'temperature': 0.7,
-        'prompt_version': os.getenv('PROMPT_VERSION', 'linyu-v1.4')})
+        'prompt_version': os.getenv('PROMPT_VERSION', 'linyu-v1.8')})
     dashscope = secret('dashscope', os.environ['DASHSCOPE_API_KEY'])
     write('memory-config', {
         'allow_live': True, 'provider': 'aliyun-qwen', 'model': os.getenv('MEMORY_MODEL', 'qwen-flash'),

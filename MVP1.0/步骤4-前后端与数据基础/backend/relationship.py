@@ -80,6 +80,23 @@ class Relationships:
         c.execute('UPDATE relationship_states SET revocation_revision=revocation_revision+1,updated_at=? WHERE conversation_id=?',(now(),cid))
         c.execute('UPDATE conversation_uses SET based_on_revocation_revision=(SELECT revocation_revision FROM relationship_states WHERE conversation_id=?) WHERE conversation_id=?',(cid,cid))
         self.memory.bump(c,cid);self.memory.cancel_active(c,cid)
+        # Roadmap 2.1: remember the state of this story line after every change.
+        if getattr(self,'branches',None):self.branches.checkpoint(c,cid)
+    STATE_FIELDS=('relationship_type','familiarity','pace','intimacy_paused','basis_event_id','familiarity_basis_id','pace_basis_id')
+    def snapshot(self,c,cid):
+        s=c.execute('SELECT * FROM relationship_states WHERE conversation_id=?',(cid,)).fetchone()
+        return {'state':{k:s[k] for k in self.STATE_FIELDS},'events':{e['id']:e['status'] for e in c.execute('SELECT id,status FROM relationship_events WHERE conversation_id=?',(cid,))}}
+    def restore(self,c,cid,snap):
+        """Put back the relationship state of a story line. Events it does not know were made on another line: they are
+        switched off here and come back with that line's own snapshot."""
+        for e in c.execute('SELECT id,status FROM relationship_events WHERE conversation_id=?',(cid,)).fetchall():
+            target=snap['events'].get(e['id'],'invalidated' if e['status'] in ('accepted','completed') else 'cancelled' if e['status'] in ('proposed','pending_review') else e['status'])
+            if target!=e['status']:c.execute('UPDATE relationship_events SET status=?,revision=revision+1,updated_at=? WHERE id=?',(target,now(),e['id']))
+        s=snap['state']
+        c.execute('UPDATE relationship_states SET relationship_type=?,familiarity=?,pace=?,intimacy_paused=?,basis_event_id=?,familiarity_basis_id=?,pace_basis_id=?,revocation_revision=revocation_revision+1,updated_at=? WHERE conversation_id=?',tuple(s[k] for k in self.STATE_FIELDS)+(now(),cid))
+        # "Only this time" choices end with the sitting on the line they were made on.
+        c.execute('UPDATE conversation_uses SET temporary_relation=NULL,temporary_relation_event_id=NULL,temporary_familiarity=NULL,temporary_familiarity_event_id=NULL,temporary_pace=NULL,temporary_pace_event_id=NULL,based_on_revocation_revision=(SELECT revocation_revision FROM relationship_states WHERE conversation_id=?) WHERE conversation_id=?',(cid,cid))
+        self.reconcile(c,cid)
     def effective(self,c,cid,use=None):
         self.reconcile(c,cid);s=dict(c.execute('SELECT * FROM relationship_states WHERE conversation_id=?',(cid,)).fetchone())
         relation=s['relationship_type'];familiar=s['familiarity'];pace=s['pace']
@@ -135,7 +152,9 @@ class Relationships:
         with self.db.connect() as c:
             c.execute('BEGIN IMMEDIATE');self.service.own(c,cid,user['id']);use=self.use(c,cid,user['session_id'],use_id)
             state=self.effective(c,cid,use);events=[]
-            for e in c.execute('SELECT * FROM relationship_events WHERE conversation_id=? AND (long_term=1 OR use_id=?) ORDER BY occurred_at DESC,rowid DESC',(cid,use['id'] if use else '')):
+            for e in c.execute('SELECT * FROM relationship_events WHERE conversation_id=? AND (long_term=1 OR use_id=?) ORDER BY occurred_at DESC,rowid DESC',(cid,use['id'] if use else '')).fetchall():
+                # Roadmap 2.1: events made on another story line are not part of this one's record.
+                if c.execute('SELECT off_path FROM messages WHERE id=?',(e['primary_source_id'],)).fetchone()[0]:continue
                 item=dict(e);item['sources']=[dict(r) for r in c.execute('SELECT m.id,m.content,m.status,m.created_at FROM messages m WHERE m.id IN (SELECT message_id FROM relationship_event_sources WHERE event_id=? UNION SELECT primary_source_id FROM relationship_events WHERE id=?)',(e['id'],e['id']))];events.append(item)
             return {'state':state,'events':events,'write_available':True,'use_id':use['id'] if use else None,'embedding_required_for_state':False}
     def control_source(self,c,cid,use_id,text):
@@ -146,7 +165,7 @@ class Relationships:
         messages=[]
         for mid in ids:
             if not isinstance(mid,str) or not re.fullmatch('[a-f0-9]{32}',mid):raise ApiError(422,'relationship_source_invalid','来源标识不正确')
-            m=c.execute("SELECT * FROM messages WHERE id=? AND conversation_id=? AND status IN ('saved','completed') AND role IN ('user','assistant')",(mid,cid)).fetchone()
+            m=c.execute("SELECT * FROM messages WHERE id=? AND conversation_id=? AND off_path=0 AND status IN ('saved','completed') AND role IN ('user','assistant')",(mid,cid)).fetchone()
             if not m or c.execute('SELECT 1 FROM memory_context_blocks WHERE conversation_id=? AND message_id=?',(cid,mid)).fetchone():raise ApiError(422,'relationship_source_invalid','来源无效')
             messages.append(m)
         messages.sort(key=lambda m:m['ordinal'])
@@ -239,7 +258,7 @@ class Relationships:
                 if body.get('confirm_repair') is not True or not isinstance(ids,list) or not 2<=len(ids)<=12 or any(not isinstance(x,str) or not re.fullmatch('[a-f0-9]{32}',x) for x in ids):raise ApiError(422,'repair_evidence_needed','请明确核对双方已接受修复的来源')
                 sources=[]
                 for sid in set(ids):
-                    row=c.execute("SELECT * FROM messages WHERE id=? AND conversation_id=? AND status IN ('saved','completed') AND role IN ('user','assistant')",(sid,cid)).fetchone()
+                    row=c.execute("SELECT * FROM messages WHERE id=? AND conversation_id=? AND off_path=0 AND status IN ('saved','completed') AND role IN ('user','assistant')",(sid,cid)).fetchone()
                     if not row or c.execute('SELECT 1 FROM memory_context_blocks WHERE conversation_id=? AND message_id=?',(cid,sid)).fetchone():raise ApiError(422,'relationship_source_invalid','修复来源无效')
                     sources.append(row)
                 if not isinstance(content,str) or not 2<=len(content)<=400 or not re.search(r'我接受你的道歉|误会说开了|我们和好了|我们已经说清楚',content) or re.search(r'以后|计划|明天|假如|如果|不接受',content):raise ApiError(422,'repair_evidence_needed','不能把未来计划或未接受的道歉记成已修复')
@@ -324,7 +343,7 @@ class Relationships:
         source=c.execute("SELECT * FROM messages WHERE id=? AND conversation_id=? AND role='user' AND status='saved'",(mid,cid)).fetchone()
         if not source or not source['content'].strip():return False
         tag=c.execute('SELECT * FROM relationship_message_tags WHERE message_id=?',(mid,)).fetchone()
-        previous=c.execute('SELECT content FROM messages WHERE conversation_id=? AND ordinal<? ORDER BY ordinal DESC LIMIT 1',(cid,source['ordinal'])).fetchone()
+        previous=c.execute('SELECT content FROM messages WHERE conversation_id=? AND off_path=0 AND ordinal<? ORDER BY ordinal DESC LIMIT 1',(cid,source['ordinal'])).fetchone()
         related=(bool(tag and tag['kind']!='user_message') or bool(RELATED.search(source['content'])) or
                  bool(previous and RELATED.search(previous['content']) and re.fullmatch(r'(?:可以|好|好的|行|嗯|哈哈|随便|你觉得呢)[。！？!?]*',source['content'])))
         if not related:return True
@@ -351,7 +370,7 @@ class Relationships:
         tagged={x[0] for x in c.execute("SELECT message_id FROM relationship_message_tags WHERE conversation_id=? AND kind!='user_message'",(cid,))}
         # Include old persisted transcripts predating step8 and generic replies to a relationship proposal.
         previous_related=False
-        for m in c.execute('SELECT id,content,role FROM messages WHERE conversation_id=? ORDER BY ordinal',(cid,)):
+        for m in c.execute('SELECT id,content,role FROM messages WHERE conversation_id=? AND off_path=0 ORDER BY ordinal',(cid,)):
             relation=bool(RELATED.search(m['content']))
             if relation or (previous_related and m['role']=='user' and re.fullmatch(r'(?:可以|好|好的|行|嗯|哈哈|随便|你觉得呢)[。！？!?]*',m['content'])):tagged.add(m['id'])
             previous_related=relation

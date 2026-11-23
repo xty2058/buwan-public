@@ -27,7 +27,7 @@ class Config:
     # Deployment switches. Defaults keep the local single-user behaviour unchanged.
     invite_required: bool = False      # registration needs a valid invite code
     guest_trial: bool = True           # "免注册试用" creates throwaway accounts
-    internal_tools: bool = True        # /evaluation and /inspect (paid evaluation calls)
+    internal_tools: bool = False        # /evaluation and /inspect (paid evaluation calls)
     open_characters: tuple = ()        # empty = every character the database marks available
     trust_proxy: bool = False          # take the client address from X-Forwarded-For (behind Caddy)
     daily_reply_limit: int = 0         # replies per user per Beijing day; 0 = unlimited
@@ -59,8 +59,8 @@ class Config:
                    secure_cookie=os.getenv('APP_COOKIE_SECURE', 'false').lower() == 'true',
                    invite_required=flag('APP_INVITE_REQUIRED', False),
                    guest_trial=flag('APP_GUEST_TRIAL', True),
-                   internal_tools=flag('APP_INTERNAL_TOOLS', True),
-                   open_characters=tuple(x.strip() for x in os.getenv('APP_OPEN_CHARACTERS', '').split(',') if x.strip()),
+                   internal_tools=False,
+                   open_characters=tuple(x.strip() for x in os.getenv('APP_OPEN_CHARACTERS', 'linyu').split(',') if x.strip()),
                    trust_proxy=flag('APP_TRUST_PROXY', False),
                    daily_reply_limit=count('APP_DAILY_REPLY_LIMIT'),
                    daily_total_limit=count('APP_DAILY_TOTAL_LIMIT'))

@@ -109,13 +109,13 @@ class Chat:
                 if self.memory and (self.memory.extractor or self.memory.embedding.configured):self.memory.ensure_ready(c,cid)
                 if c.execute("SELECT 1 FROM generation_requests WHERE conversation_id=? AND status IN ('queued','generating','awaiting_choice')", (cid,)).fetchone():
                     raise ApiError(409, 'generation_pending', '先结束当前生成或决定候选回复')
-                source = c.execute("SELECT * FROM messages WHERE id=? AND conversation_id=? AND role='user' AND status='saved'", (user_message_id, cid)).fetchone()
+                source = c.execute("SELECT * FROM messages WHERE id=? AND conversation_id=? AND off_path=0 AND role='user' AND status='saved'", (user_message_id, cid)).fetchone()
                 if not source:
                     raise ApiError(404, 'not_found', '用户消息不存在或不可访问')
                 use=None
                 if self.relationship:use=self.relationship.use(c,cid,user['session_id'],body.get('use_id'),bool(body.get('use_id')))
                 self.require_source(c,cid,user_message_id,user['session_id'],use['id'] if use else None)
-                if c.execute("SELECT 1 FROM messages WHERE conversation_id=? AND role='user' AND ordinal>?", (cid, source['ordinal'])).fetchone():
+                if c.execute("SELECT 1 FROM messages WHERE conversation_id=? AND off_path=0 AND role='user' AND ordinal>?", (cid, source['ordinal'])).fetchone():
                     raise ApiError(409, 'not_latest_turn', '已有后续用户消息，不能重做旧轮次')
                 if kind == 'regenerate':
                     original = c.execute("SELECT * FROM messages WHERE id=? AND conversation_id=? AND role='assistant' AND status='completed' AND reply_to_id=?", (original_id, cid, user_message_id)).fetchone()
@@ -174,7 +174,7 @@ class Chat:
             self.require_source(c,cid,r['user_message_id'],user['session_id'],use['id'] if use else None)
             if self.memory and (self.memory.extractor or self.memory.embedding.configured):self.memory.ensure_ready(c,cid)
             source = c.execute('SELECT ordinal FROM messages WHERE id=?',(r['user_message_id'],)).fetchone()
-            if c.execute("SELECT 1 FROM messages WHERE conversation_id=? AND role='user' AND ordinal>?",(cid,source['ordinal'])).fetchone():
+            if c.execute("SELECT 1 FROM messages WHERE conversation_id=? AND off_path=0 AND role='user' AND ordinal>?",(cid,source['ordinal'])).fetchone():
                 raise ApiError(409,'not_latest_turn','已有后续用户消息，不能重做旧轮次')
             if c.execute("SELECT 1 FROM generation_requests WHERE conversation_id=? AND status IN ('queued','generating','awaiting_choice')",(cid,)).fetchone():
                 raise ApiError(409,'generation_pending','先结束当前生成或决定候选回复')
@@ -191,7 +191,7 @@ class Chat:
         return self.snapshot(user['id'],cid,rid,session_id=user['session_id'],use_id=body.get('use_id'))
 
     def source_available(self,c,cid,mid,session_id=None,use_id=None):
-        source=c.execute("SELECT content FROM messages WHERE id=? AND conversation_id=? AND role='user' AND status='saved'",(mid,cid)).fetchone()
+        source=c.execute("SELECT content FROM messages WHERE id=? AND conversation_id=? AND off_path=0 AND role='user' AND status='saved'",(mid,cid)).fetchone()
         if not source or not source['content'].strip() or c.execute('SELECT 1 FROM memory_context_blocks WHERE conversation_id=? AND message_id=?',(cid,mid)).fetchone():return False
         return not self.relationship or self.relationship.source_available(c,cid,mid,session_id,use_id)
 
@@ -220,7 +220,7 @@ class Chat:
                             and not c.execute("SELECT 1 FROM generation_requests WHERE original_reply_id=? AND kind='regenerate' AND status='adopted'",(r['result_message_id'],)).fetchone())
             if completed_race:
                 source=c.execute('SELECT ordinal FROM messages WHERE id=?',(r['user_message_id'],)).fetchone()[0]
-                completed_race=not c.execute("SELECT 1 FROM messages WHERE conversation_id=? AND role='user' AND ordinal>?",(cid,source)).fetchone()
+                completed_race=not c.execute("SELECT 1 FROM messages WHERE conversation_id=? AND off_path=0 AND role='user' AND ordinal>?",(cid,source)).fetchone()
             if r['status'] in ('queued','generating') or completed_race:
                 target='kept' if r['kind']=='regenerate' else 'stopped'
                 c.execute('UPDATE generation_requests SET status=?,revision=revision+1,updated_at=? WHERE id=?',(target,now(),rid))
@@ -304,7 +304,7 @@ class Chat:
         offered=[]
         # Roadmap 1.12: scene ledger, with fields whose source messages were deleted or blocked dropped.
         scene_state=scene_ledger.read(c,r['conversation_id'],self.memory.blocked_context_ids(c,r['conversation_id']) if self.memory else ())
-        history=c.execute("SELECT * FROM messages WHERE conversation_id=? AND ordinal<=? AND status IN ('saved','completed','stopped','failed') ORDER BY ordinal DESC LIMIT 40",(r['conversation_id'],source)).fetchall()
+        history=c.execute("SELECT * FROM messages WHERE conversation_id=? AND off_path=0 AND ordinal<=? AND status IN ('saved','completed','stopped','failed') ORDER BY ordinal DESC LIMIT 40",(r['conversation_id'],source)).fetchall()
         if self.memory:history=self.memory.filter_context(c,r['conversation_id'],history)
         summary=self.summaries.read(c,r['conversation_id'],history) if getattr(self,'summaries',None) else []
         if self.relationship:
